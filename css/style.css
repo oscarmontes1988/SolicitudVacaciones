@@ -1,0 +1,240 @@
+/**
+ * Archivo: css/style.css
+ *
+ * Rol: Hoja de Estilos en Cascada principal de la aplicación.
+ *
+ * Objetivo:
+ * Este archivo define la apariencia visual y el layout de toda la aplicación.
+ * La estrategia aquí es usar un enfoque directo y funcional, con clases de utilidad
+ * y selectores simples, lo cual es apropiado para una aplicación de gestión interna
+ * de este tamaño. No se utiliza un framework CSS complejo como Bootstrap o Tailwind,
+ * lo que mantiene el código ligero pero requiere una definición manual de los estilos.
+ *
+ * Estructura y Metodología:
+ * El CSS está organizado de forma semántica, comenzando por los estilos globales (body),
+ * seguido por los componentes de layout principales (container, header), y luego
+ * los componentes específicos (tablas, botones, formularios, modales).
+ * Se utiliza una nomenclatura de clases basada en componentes (ej. .form-group) y
+ * modificadores (ej. .btn-primary) que recuerda a metodologías como BEM,
+ * aunque no se aplique de forma estricta.
+ */
+
+/* === ESTILOS GLOBALES Y TIPOGRAFÍA === */
+/* Buena práctica: Se define una base tipográfica consistente para toda la aplicación. */
+body {
+  /*
+   * Justificación Técnica (font-family):
+   * Se utiliza una "pila de fuentes" (font stack) moderna y segura para el sistema.
+   * '-apple-system' y 'BlinkMacSystemFont' apuntan a la fuente del sistema en macOS (San Francisco)
+   * y Chrome en macOS. 'Segoe UI' es la fuente del sistema en Windows. 'Roboto' es un fallback
+   * excelente para Android y sistemas Linux. 'Helvetica Neue' y 'Arial' son fallbacks
+   * muy seguros, y 'sans-serif' es el último recurso genérico.
+   * Esto asegura que la aplicación se vea nativa y de alto rendimiento en cualquier sistema operativo.
+   */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background-color: #f8f9fa; /* Un gris muy claro para el fondo, reduce la fatiga visual. */
+  color: #343a40; /* Un negro suave en lugar de #000, mejora la legibilidad. */
+  line-height: 1.5; /* Espaciado de línea generoso para una fácil lectura de párrafos. */
+  margin: 0; /* Resetea el margen por defecto del body para un control total del layout. */
+}
+
+/* === LAYOUT PRINCIPAL === */
+
+/*
+ * .container: Define el contenedor principal centrado.
+ * Es un patrón de diseño de layout muy común.
+ */
+.container {
+  max-width: 1100px; /* Limita el ancho en pantallas grandes para evitar que las líneas de texto sean demasiado largas. */
+  margin: 20px auto; /* Centra el contenedor horizontalmente. */
+  background: #fff;
+  padding: 25px;
+  border-radius: 8px; /* Bordes redondeados para una apariencia más suave y moderna. */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil que eleva el contenedor del fondo. */
+}
+header {
+  padding-bottom: 15px;
+  border-bottom: 1px solid #dee2e6; /* Separador visual claro. */
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+header h1 {
+  margin: 0; /* Reseteo para evitar espaciados indeseados. */
+  color: #0056b3; /* Un azul corporativo para el título principal. */
+}
+.user-info span {
+  font-weight: bold;
+  margin-right: 15px;
+}
+.user-info a {
+  color: #007bff;
+  text-decoration: none; /* Buena práctica: los enlaces de navegación no suelen necesitar subrayado. */
+}
+
+/* === COMPONENTES === */
+
+/* Tablas */
+table {
+  width: 100%; /* La tabla ocupa todo el ancho disponible en su contenedor. */
+  border-collapse: collapse; /* Une los bordes de las celdas para una apariencia limpia. */
+  margin-top: 20px;
+}
+th,
+td {
+  border: 1px solid #dee2e6; /* Bordes suaves para las celdas. */
+  padding: 12px; /* Espaciado interno generoso para no ahogar el contenido. */
+  text-align: left; /* Alineación estándar para texto en la mayoría de los idiomas occidentales. */
+}
+th {
+  background-color: #e9ecef; /* Un fondo ligeramente diferente para las cabeceras de la tabla. */
+}
+
+/* Botones (Clase de utilidad base) */
+.btn {
+  /* Esta es una clase base. Define todos los estilos comunes a todos los botones. */
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  /* Animación sutil al pasar el ratón, mejora la experiencia de usuario. */
+  transition: background-color 0.2s;
+}
+.btn:hover {
+  /* Efecto al pasar el ratón. Usar 'opacity' es una forma simple y efectiva. */
+  opacity: 0.9;
+}
+
+/* Modificadores de Botón */
+/* Estas clases se AÑADEN a la clase .btn para cambiar solo el color. */
+.btn-primary {
+  background-color: #007bff;
+}
+.btn-success {
+  background-color: #28a745;
+}
+.btn-danger {
+  background-color: #dc3545;
+}
+.btn-secondary {
+  background-color: #6c757d;
+}
+
+/* Formularios */
+#form-container {
+  /* Estilos para el contenedor del formulario que se muestra/oculta. */
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: #f9f9f9;
+}
+.form-group {
+  /* Agrupa una etiqueta y su campo de entrada, facilitando el espaciado. */
+  margin-bottom: 15px;
+}
+.form-group label {
+  display: block; /* Asegura que la etiqueta ocupe su propia línea. */
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  /* Justificación Técnica (box-sizing): 'border-box' es una práctica esencial.
+   * Hace que el 'padding' y el 'border' se incluyan DENTRO del 'width' del elemento,
+   * en lugar de sumarse a él. Esto simplifica enormemente los cálculos de layout. */
+  box-sizing: border-box;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+.form-group input:disabled {
+  /* Estilo visual para campos no editables, mejora la usabilidad. */
+  background-color: #e9ecef;
+}
+.form-actions {
+  /* Contenedor para los botones de acción del formulario. */
+  margin-top: 20px;
+  text-align: right; /* Alinea los botones a la derecha, una convención común. */
+}
+.form-actions button {
+  margin-left: 10px; /* Espaciado entre botones. */
+}
+
+/* Indicadores de Estado (Status Badges) */
+.status {
+  padding: 5px 10px;
+  color: black; /* Color de texto por defecto, aunque se sobreescribe abajo. */
+  border-radius: 15px; /* Bordes muy redondeados para una apariencia de "píldora". */
+  font-size: 0.85em;
+  text-align: center;
+}
+
+/*
+ * Justificación Técnica (Selectores de Modificador):
+ * Se usa el patrón `.clase-base.modificador`. Por ejemplo, `.status.rechazada`.
+ * Esto asegura que el estilo del modificador solo se aplique a elementos que ya tienen
+ * la clase base `.status`. Es más específico y robusto que tener solo `.rechazada`.
+ */
+
+.status.esperando-aprobacion-coordinador,
+.status.esperando-aprobacion-jefe-de-area {
+  background-color: #ffc107; /* Amarillo/Naranja para "pendiente". */
+  color: #333; /* Texto oscuro para una mejor legibilidad sobre un fondo claro. */
+}
+.status.vacaciones-autorizadas {
+  background-color: #28a745; /* Verde para "éxito". */
+}
+.status.rechazada {
+  background-color: #dc3545; /* Rojo para "error" o "rechazo". */
+}
+
+/* Ventana Modal */
+#decision-modal {
+  display: none; /* Oculto por defecto. JavaScript lo cambiará a 'block' o 'flex'. */
+  position: fixed; /* Lo saca del flujo normal del documento y lo posiciona relativo a la ventana del navegador. */
+  z-index: 1000; /* Un z-index alto para asegurar que se muestre por encima de todo lo demás. */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.5
+  ); /* Fondo semitransparente para enfocar la atención en el modal. */
+}
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* Centrado vertical (aproximado) y horizontal. */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  /* Mejora posible: Usar Flexbox o Grid en el contenedor del modal (#decision-modal) para un centrado vertical y horizontal perfecto y moderno. */
+}
+.close-modal {
+  color: #aaa;
+  float: right; /* Método tradicional para alinear a la derecha. Flexbox sería más moderno. */
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+/* Contenedor específico para la página de Login */
+.login-container {
+  width: 350px;
+  margin: 100px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
