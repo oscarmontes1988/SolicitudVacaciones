@@ -1,4 +1,18 @@
-<?php // Archivo: templates/dashboard_aprobador.php 
+<?php
+
+/**
+ * Archivo: templates/dashboard_aprobador.php
+ *
+ * Rol: Vista (View) para el panel del Aprobador.
+ *
+ * Arquitectura:
+ * Este archivo es un componente de la capa de presentación (la "V" en un patrón MVC).
+ * Su única responsabilidad es renderizar el HTML que ve el usuario aprobador.
+ * Es un archivo "tonto" por diseño: recibe una variable pre-procesada (`$pendientes`)
+ * desde el controlador (`dashboard.php`) y se limita a mostrar esos datos.
+ * No realiza consultas a la base de datos ni contiene lógica de negocio compleja.
+ * Este desacoplamiento es esencial para la mantenibilidad.
+ */
 ?>
 <h2>Solicitudes Pendientes de Aprobación</h2>
 <table id="pendientes-table">
