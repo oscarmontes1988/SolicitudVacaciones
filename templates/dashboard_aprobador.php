@@ -1,10 +1,22 @@
-<?php // Archivo: templates/dashboard_aprobador.php ?>
+<?php // Archivo: templates/dashboard_aprobador.php 
+?>
 <h2>Solicitudes Pendientes de Aprobación</h2>
 <table id="pendientes-table">
-    <thead><tr><th>Solicitante</th><th>Cédula</th><th>Dependencia</th><th>Periodo de Disfrute</th><th>Fecha Solicitud</th><th>Acciones</th></tr></thead>
+    <thead>
+        <tr>
+            <th>Solicitante</th>
+            <th>Cédula</th>
+            <th>Dependencia</th>
+            <th>Periodo de Disfrute</th>
+            <th>Fecha Solicitud</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
     <tbody>
         <?php if (empty($pendientes)): ?>
-            <tr><td colspan="6">No hay solicitudes pendientes.</td></tr>
+            <tr>
+                <td colspan="6">No hay solicitudes pendientes.</td>
+            </tr>
         <?php else: ?>
             <?php foreach ($pendientes as $solicitud): ?>
                 <tr data-id="<?php echo $solicitud['id']; ?>">
