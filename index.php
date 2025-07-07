@@ -3,9 +3,8 @@
 session_start();
 if (isset($_SESSION['user'])) {
     header('Location: dashboard.php');
-    exit;
+    exit();
 } else {
     header('Location: login.php');
-    exit;
+    exit();
 }
-?>
