@@ -136,6 +136,7 @@ th {
 .form-group {
   /* Agrupa una etiqueta y su campo de entrada, facilitando el espaciado. */
   margin-bottom: 15px;
+  position: relative; /* Necesario para posicionar el icono del ojo dentro del grupo */
 }
 .form-group label {
   display: block; /* Asegura que la etiqueta ocupe su propia línea. */
@@ -143,6 +144,7 @@ th {
   font-weight: bold;
 }
 .form-group input[type="text"],
+.form-group input[type="password"],
 .form-group input[type="date"],
 .form-group select,
 .form-group textarea {
@@ -166,6 +168,23 @@ th {
 }
 .form-actions button {
   margin-left: 10px; /* Espaciado entre botones. */
+}
+
+/*
+ * Clase de utilidad para Accesibilidad (Screen-reader only).
+ * Oculta un elemento visualmente, pero lo mantiene accesible para lectores de pantalla.
+ * Esencial para usar placeholders sin perder la accesibilidad de las etiquetas <label>.
+ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* Indicadores de Estado (Status Badges) */
@@ -246,7 +265,11 @@ body.login-page {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-image: url("https://res.cloudinary.com/dfed81ssz/image/upload/v1751995141/bg_uyq5dx.jpg");
+  background-size: cover; /* Hace que la imagen cubra toda la pantalla sin deformarse. */
+  background-position: center; /* Centra la imagen en la pantalla. */
+  background-repeat: no-repeat; /* Evita que la imagen se repita si es pequeña. */
+  background-attachment: fixed; /* Fija la imagen para que no se desplace con el contenido. */
   margin: 0;
 }
 
@@ -292,4 +315,21 @@ body.login-page {
 
 .login-container .form-group input {
   text-align: center;
+}
+
+/* Estilos para el icono de mostrar/ocultar contraseña */
+.toggle-password {
+  position: absolute; /* Lo saca del flujo normal para posicionarlo sobre el input */
+  top: 50%; /* Lo alinea verticalmente al centro */
+  right: 15px; /* Lo posiciona a la derecha del campo */
+  transform: translateY(
+    -50%
+  ); /* Ajuste fino para un centrado vertical perfecto */
+  cursor: pointer;
+  color: #aaa; /* Un color gris suave por defecto */
+  transition: color 0.2s; /* Animación suave para el cambio de color */
+}
+
+.toggle-password:hover {
+  color: #333; /* Se oscurece al pasar el ratón por encima */
 }

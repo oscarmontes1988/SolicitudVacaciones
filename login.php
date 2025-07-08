@@ -33,18 +33,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistema de Vacaciones</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Se añade Font Awesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body class="login-page">
     <div class="login-container">
-        <h2>Iniciar Sesión</h2>
+        <h2>Sistema de Vacaciones - Login</h2>
         <?php if ($error): ?><p class="error-message"><?php echo $error; ?></p><?php endif; ?>
         <form method="POST" action="login.php">
-            <div class="form-group"><label for="username">Usuario:</label><input type="text" id="username" name="username" required></div>
-            <div class="form-group"><label for="password">Contraseña:</label><input type="password" id="password" name="password" required></div>
-            <button type="submit" class="btn btn-primary">Ingresar</button>
+            <div class="form-group">
+                <label for="username" class="sr-only">Usuario:</label>
+                <input type="text" id="username" name="username" placeholder="Usuario" required>
+            </div>
+            <div class="form-group">
+                <label for="password" class="sr-only">Contraseña:</label>
+                <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                <!-- Icono del ojo para mostrar/ocultar contraseña -->
+                <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+            </div>
+            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
         </form>
     </div>
+
+    <script>
+        // Seleccionamos el icono y el campo de contraseña
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+
+        // Añadimos un evento de 'click' al icono
+        togglePassword.addEventListener('click', function(e) {
+            // Cambiamos el atributo 'type' del campo de contraseña
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+
+            // Cambiamos el icono del ojo (abierto/cerrado)
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
 
 </html>
