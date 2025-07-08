@@ -230,11 +230,66 @@ th {
   cursor: pointer;
 }
 /* Contenedor específico para la página de Login */
+/* === ESTILOS ESPECÍFICOS PARA LA PÁGINA DE LOGIN (MODERNIZADO) === */
+
+/*
+ * Justificación Técnica (Centrado con Flexbox):
+ * Usamos Flexbox en el body para lograr un centrado vertical y horizontal perfecto.
+ * 'display: flex' activa el modelo de caja flexible.
+ * 'align-items: center' centra los ítems en el eje transversal (verticalmente).
+ * 'justify-content: center' centra los ítems en el eje principal (horizontalmente).
+ * 'min-height: 100vh' asegura que el body ocupe al menos toda la altura de la ventana,
+ * lo que es crucial para que el centrado vertical funcione correctamente.
+ */
+body.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin: 0;
+}
+
+/* Se reemplaza el .login-container anterior con esta versión mejorada */
 .login-container {
-  width: 350px;
-  margin: 100px auto;
-  padding: 30px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px; /* Ancho máximo para que se vea bien en pantallas más grandes */
+  padding: 40px;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.95
+  ); /* Fondo blanco ligeramente traslúcido */
+  border-radius: 15px; /* Bordes más redondeados */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada para efecto "flotante" */
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 20px; /* Margen para que no pegue a los bordes en pantallas pequeñas */
+}
+
+.login-container h2 {
+  margin-top: 0;
+  margin-bottom: 25px;
+  color: #333;
+  font-weight: 600;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.login-container .btn-primary {
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+}
+
+.login-container .form-group input {
+  text-align: center;
 }
