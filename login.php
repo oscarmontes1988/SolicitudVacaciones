@@ -10,7 +10,13 @@ require_once 'models/user_model.php';
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = getUserByUsername($conn, $_POST['username']);
-    if ($user && $user['password'] === $_POST['password']) { // ADVERTENCIA: Usar password_verify en producción
+
+    // --- INICIO DE CÓDIGO DE DEPURACIÓN TEMPORAL ---
+    //var_dump($user);
+    //die(); // Detiene la ejecución para que podamos ver la salida.
+    // --- FIN DE CÓDIGO DE DEPURACIÓN TEMPORAL ---
+    // ¡CORRECCIÓN DE SEGURIDAD CRÍTICA!
+    if ($user && password_verify($_POST['password'], $user['password'])) {
         $_SESSION['user'] = $user;
         header('Location: dashboard.php');
         exit;
