@@ -11,7 +11,19 @@ $is_disabled = $total_dias_disponibles <= 0;
 <!-- Hero Section -->
 <div class="dashboard-hero">
     <div class="hero-text">
-        <h2>Hola, <?php echo htmlspecialchars(explode(' ', $user['nombre_completo'])[0]); ?></h2>
+        <h2>Hola,
+            <?php
+            $nombres = explode(' ', $user['nombre_completo']); // Divide el nombre completo por espacios
+
+            // Muestra el primer nombre
+            echo htmlspecialchars($nombres[0]);
+
+            // Si existe un segundo nombre, lo muestra
+            if (isset($nombres[1])) {
+                echo ' ' . htmlspecialchars($nombres[1]);
+            }
+            ?>
+        </h2>
         <p>
             <?php if (!$is_disabled) : ?>
                 Estás list@ para tu próximo descanso. Tienes un total de...
@@ -89,7 +101,7 @@ $is_disabled = $total_dias_disponibles <= 0;
                     <div class="period-card">
                         <div class="period-card-icon"><i class="fas fa-calendar-check"></i></div>
                         <div class="period-card-info">
-                            <strong>Periodo de Causación</strong>
+                            <strong>Período de Causación</strong>
                             <span><?php echo htmlspecialchars(date("d/m/Y", strtotime($periodo['fecha_inicio']))); ?> al <?php echo htmlspecialchars(date("d/m/Y", strtotime($periodo['fecha_fin']))); ?></span>
                         </div>
                     </div>
