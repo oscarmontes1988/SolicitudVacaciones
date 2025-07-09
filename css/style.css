@@ -104,6 +104,9 @@ th {
   /* Animación sutil al pasar el ratón, mejora la experiencia de usuario. */
   transition: background-color 0.2s;
 }
+.btn i {
+  margin-right: 8px; /* Espacio entre el icono y el texto del botón */
+}
 .btn:hover {
   /* Efecto al pasar el ratón. Usar 'opacity' es una forma simple y efectiva. */
   opacity: 0.9;
@@ -122,6 +125,116 @@ th {
 }
 .btn-secondary {
   background-color: #6c757d;
+}
+
+/* Modificador para botones deshabilitados */
+.btn:disabled {
+  background-color: #9ea7b0; /* Un gris más claro para indicar que está inactivo */
+  opacity: 0.7;
+  cursor: not-allowed;
+  /* Se quita el efecto hover para botones deshabilitados */
+  pointer-events: none;
+}
+
+/* Modificador para botones grandes */
+.btn-lg {
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+}
+
+/* === ESTILOS PARA EL DASHBOARD === */
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+  color: #343a40;
+}
+
+/* Contenedor de tarjetas */
+.card-container {
+  display: grid;
+  /* Crea columnas responsivas: intentará que midan 280px, pero se ajustarán para llenar el espacio. */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px; /* Espacio entre las tarjetas */
+  margin-top: 20px;
+}
+
+/* Estilo base de la tarjeta */
+.card {
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e9ecef;
+  border-radius: 12px 12px 0 0;
+}
+.card-header h4 {
+  margin: 0;
+  color: #0056b3;
+  font-size: 1rem;
+}
+.card-header span {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.card-body {
+  padding: 25px 20px;
+  text-align: center;
+  flex-grow: 1; /* Hace que esta sección ocupe el espacio disponible */
+}
+.card-body .days-available {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #28a745;
+  margin: 0;
+}
+.card-body .days-label {
+  margin: 0;
+  color: #6c757d;
+}
+
+.card-footer {
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  border-radius: 0 0 12px 12px;
+  text-align: center;
+}
+
+/* Modificador para botones pequeños */
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.info-card {
+  padding: 20px;
+  text-align: center;
+  color: #6c757d;
+  background-color: #f8f9fa;
 }
 
 /* Formularios */
@@ -355,4 +468,270 @@ body.login-page {
   padding: 10px;
   border-radius: 5px;
   margin-bottom: 15px;
+}
+/* === ESTILOS INSPIRADOS EN MINTIC (SOLICITANTE DASHBOARD) === */
+
+.dashboard-hero {
+  background: linear-gradient(
+    135deg,
+    #007bff,
+    #00bfff
+  ); /* Azul principal de Mintic */
+  color: white;
+  padding: 60px 40px;
+  border-radius: 15px;
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.hero-text {
+  max-width: 60%;
+}
+
+.hero-text h2 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.hero-text p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.hero-days-container {
+  display: flex;
+  align-items: baseline;
+  margin-top: 20px;
+}
+
+.hero-days {
+  font-size: 4rem;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.hero-days-label {
+  font-size: 1.5rem;
+  opacity: 0.8;
+}
+
+.mintic-btn {
+  background-color: #28a745; /* Verde para acciones positivas */
+  border: none;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.mintic-btn:hover {
+  background-color: #218838; /* Verde más oscuro al pasar el ratón */
+}
+
+.hero-image {
+  /* Por ahora, solo un contenedor.  En el futuro, añadiríamos la imagen aquí como fondo o <img> */
+  width: 35%;
+  /*  Si tuvieras una imagen SVG:
+  background-image: url('img/vacaciones.svg');  
+  background-size: contain;
+  background-repeat: no-repeat;
+  */
+}
+
+/*  Ejemplo para hacer el botón más llamativo (opcional):
+.btn-primary.btn-lg {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+} */
+/* === ESTILOS PARA TARJETAS DE ESTADÍSTICAS (APROBADOR) === */
+
+.stat-card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 20px;
+  color: white;
+  font-size: 24px;
+}
+
+.stat-card-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-card-title {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.stat-card-value {
+  color: #343a40;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* === NUEVO LAYOUT DE DASHBOARD SOLICITANTE === */
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px; /* Columna principal flexible y barra lateral de ancho fijo */
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.dashboard-main {
+  grid-column: 1 / 2;
+}
+
+.dashboard-sidebar {
+  grid-column: 2 / 3;
+}
+
+.dashboard-section-title {
+  font-size: 1.5rem;
+  color: #343a40;
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.period-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.period-card {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  /* Se añade para alinear el nuevo botón */
+  justify-content: space-between;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+}
+
+.period-card-icon {
+  font-size: 1.5rem;
+  color: #007bff;
+  margin-right: 15px;
+}
+
+.period-card-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Permite que la info ocupe el espacio disponible */
+}
+
+.period-card-info strong {
+  font-size: 0.9rem;
+  color: #343a40;
+}
+
+.period-card-info span {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.period-card-action {
+  margin-left: 15px;
+}
+
+.period-card-empty {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  color: #6c757d;
+  border: 1px dashed #dee2e6;
+}
+
+/* Estilos para el nuevo modal de solicitud */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  align-items: center;
+  justify-content: center;
+}
+
+/* Estilos para la lista de periodos disponibles en el Hero */
+.available-periods {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.available-periods h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 15px;
+  opacity: 0.9;
+}
+
+.available-periods ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.available-periods li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 10px 15px;
+  border-radius: 8px;
+}
+
+.available-periods li i {
+  color: #28a745; /* Un verde brillante para indicar disponibilidad */
+  margin-right: 15px;
+  font-size: 1.2rem;
 }
