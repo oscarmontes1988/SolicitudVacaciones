@@ -92,12 +92,6 @@ $is_disabled = $total_dias_disponibles <= 0;
                             <strong>Periodo de Causación</strong>
                             <span><?php echo htmlspecialchars(date("d/m/Y", strtotime($periodo['fecha_inicio']))); ?> al <?php echo htmlspecialchars(date("d/m/Y", strtotime($periodo['fecha_fin']))); ?></span>
                         </div>
-                        <div class="period-card-action">
-                            <button class="btn btn-primary btn-sm btn-solicitar-periodo"
-                                data-periodo-id="<?php echo $periodo['id']; ?>">
-                                Solicitar
-                            </button>
-                        </div>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
