@@ -54,3 +54,52 @@ function getPeriodosCausacion($conn, $userId)
     // fetch_all(MYSQLI_ASSOC) es perfecto cuando esperamos múltiples filas. Nos devuelve un array de arrays.
     return $result->fetch_all(MYSQLI_ASSOC);
 }
+
+/**
+ * Obtiene un usuario por su dirección de correo electrónico.
+ * Necesario para el proceso de "Olvidé mi contraseña".
+ */
+function getUserByEmail($conn, $email)
+{
+    $sql = "SELECT * FROM users WHERE email = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
+/**
+ * Guarda el token de restablecimiento y su fecha de expiración para un usuario.
+ */
+function setResetToken($conn, $userId, $token, $expires_at)
+{
+    $sql = "UPDATE users SET reset_token = ?, reset_token_expires_at = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssi", $token, $expires_at, $userId);
+    return $stmt->execute();
+}
+
+/**
+ * Busca un usuario por un token de restablecimiento que no haya expirado.
+ */
+function getUserByResetToken($conn, $token)
+{
+    $sql = "SELECT * FROM users WHERE reset_token = ? AND reset_token_expires_at > NOW()";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $token);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
+
+/**
+ * Actualiza la contraseña de un usuario y limpia los campos del token de restablecimiento.
+ */
+function updatePassword($conn, $userId, $new_password_hash)
+{
+    $sql = "UPDATE users SET password = ?, reset_token = NULL, reset_token_expires_at = NULL WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("si", $new_password_hash, $userId);
+    return $stmt->execute();
+}

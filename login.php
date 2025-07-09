@@ -52,8 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Icono del ojo para mostrar/ocultar contraseña -->
                 <i class="fas fa-eye toggle-password" id="togglePassword"></i>
             </div>
-            <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+            <button type="submit" class="btn btn-primary" id="loginButton">
+                <span class="btn-text">Iniciar Sesión</span>
+                <span class="spinner"></span>
+            </button>
         </form>
+        <div class="login-footer">
+            <a href="forgot_password.php">¿Olvidaste tu contraseña?</a>
+        </div>
     </div>
 
     <script>

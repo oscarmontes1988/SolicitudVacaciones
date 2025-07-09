@@ -333,3 +333,26 @@ body.login-page {
 .toggle-password:hover {
   color: #333; /* Se oscurece al pasar el ratón por encima */
 }
+
+.login-footer {
+  margin-top: 20px;
+}
+
+.login-footer a {
+  color: #0056b3;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
+}
+
+.success-message {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
