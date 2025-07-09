@@ -5,13 +5,6 @@ function format_status_class($status)
 {
     return str_replace(' ', '-', strtolower(htmlspecialchars($status)));
 }
-
-// Lógica para calcular el total de días disponibles
-$total_dias_disponibles = 0;
-foreach ($periodos as $periodo) {
-    // Nota: Este valor es un ejemplo. Necesitarías calcular los días reales.
-    $total_dias_disponibles += 15;
-}
 $is_disabled = $total_dias_disponibles <= 0;
 ?>
 
@@ -21,7 +14,7 @@ $is_disabled = $total_dias_disponibles <= 0;
         <h2>Hola, <?php echo htmlspecialchars(explode(' ', $user['nombre_completo'])[0]); ?></h2>
         <p>
             <?php if (!$is_disabled) : ?>
-                Estás listo para tu próximo descanso. Tienes un total de...
+                Estás list@ para tu próximo descanso. Tienes un total de...
             <?php else : ?>
                 Actualmente no tienes días de vacaciones disponibles para solicitar.
             <?php endif; ?>
@@ -115,5 +108,26 @@ $is_disabled = $total_dias_disponibles <= 0;
 <!-- FORMULARIO MODAL DE NUEVA SOLICITUD -->
 <div id="solicitud-modal" class="modal-overlay" style="display:none;">
     <div class="modal-content">
-        <span class="close-
+        <span class="close-modal">×</span>
+        <h2>Nueva Solicitud de Vacaciones</h2>
+        <form id="form-nueva-solicitud">
+            <input type="hidden" id="modal_periodo_id" name="periodo_id">
+            <div class="form-group">
+                <label for="fecha_inicio_disfrute">Fecha de Inicio:</label>
+                <input type="date" id="fecha_inicio_disfrute" name="fecha_inicio_disfrute" required>
+            </div>
+            <div class="form-group">
+                <label for="fecha_fin_disfrute">Fecha de Fin:</label>
+                <input type="date" id="fecha_fin_disfrute" name="fecha_fin_disfrute" required>
+            </div>
+            <div class="form-group">
+                <label for="comentarios">Comentarios (Opcional):</label>
+                <textarea id="comentarios" name="comentarios" rows="4"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Enviar Solicitud</button>
+                <button type="button" class="btn btn-secondary" id="btn-cancelar-solicitud">Cancelar</button>
+            </div>
+        </form>
+    </div>
 </div>

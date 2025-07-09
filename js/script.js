@@ -59,37 +59,36 @@
 //   });
 // });
 
-const $btnCancelarSolicitud = $("#btn-cancelar-solicitud");
-const $closeSolicitudModal = $("#close-solicitud-modal");
+$(document).ready(function () {
+  // --- LÓGICA PARA DASHBOARD DEL SOLICITANTE (MODAL) ---
+  const $solicitudModal = $("#solicitud-modal");
+  const $btnNuevaSolicitud = $("#btn-nueva-solicitud");
+  const $btnCancelarSolicitud = $("#btn-cancelar-solicitud");
+  const $closeSolicitudModal = $(".close-modal"); // Corregido de ID a clase
 
-const closeModal = function () {
-  // Resetea el formulario y se asegura que el select esté habilitado para la próxima vez
-  $("#form-vacaciones")[0].reset();
-  $("#periodo_causacion_id").prop("disabled", false);
-  $solicitudModal.hide();
-};
+  const closeModal = function () {
+    // Resetea el formulario y se asegura que el select esté habilitado para la próxima vez
+    // Nota: El formulario se llama #form-nueva-solicitud, no #form-vacaciones
+    $("#form-nueva-solicitud")[0].reset();
+    $("#modal_periodo_id").prop("disabled", false);
+    $solicitudModal.hide();
+  };
+  if ($solicitudModal.length) {
+    // Abre el modal desde el botón principal
+    $btnNuevaSolicitud.on("click", function () {
+      $("#modal_periodo_id").val(""); // Limpia el periodo por si se abre genéricamente
+      $solicitudModal.css("display", "flex"); // Usamos flex para centrar el contenido
+    });
 
-if ($solicitudModal.length) {
-  // Abre el modal de forma genérica (el usuario debe elegir el periodo)
-  $btnNuevaSolicitud.on("click", function () {
-    $("#periodo_causacion_id").prop("disabled", false).val(""); // Habilita y limpia el select
-    $solicitudModal.css("display", "flex"); // Usamos flex para centrar el contenido
-  });
-
-  // Abre el modal de forma contextual (el periodo ya viene seleccionado)
-  $(".dashboard-sidebar").on("click", ".btn-solicitar-periodo", function () {
-    const periodId = $(this).data("periodo-id");
-    const $periodoSelect = $("#periodo_causacion_id");
-
-    // Pre-selecciona el periodo en el dropdown y lo deshabilita
-    $periodoSelect.val(periodId).prop("disabled", true);
-
-    // Muestra el modal
-    $solicitudModal.css("display", "flex");
-  });
-
-  $closeSolicitudModal.on("click", closeModal);
-  $btnCancelarSolicitud.on("click", closeModal);
-}
-
-// --- LÓGICA PARA DASHBOARD DEL APROBADOR (MODAL) ---
+    // Abre el modal desde un periodo específico en la barra lateral
+    $(".dashboard-sidebar").on("click", ".btn-solicitar-periodo", function () {
+      const periodId = $(this).data("periodo-id");
+      $("#modal_periodo_id").val(periodId);
+      $solicitudModal.css("display", "flex");
+    });
+    $closeSolicitudModal.on("click", closeModal);
+    $btnCancelarSolicitud.on("click", closeModal);
+  }
+  // --- LÓGICA PARA DASHBOARD DEL APROBADOR (MODAL) ---
+  // (El resto del código del aprobador iría aquí)
+});
