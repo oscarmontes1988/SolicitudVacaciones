@@ -1,796 +1,608 @@
-/**
- * Archivo: css/style.css
- *
- * Rol: Hoja de Estilos en Cascada principal de la aplicación.
- *
- * Objetivo:
- * Este archivo define la apariencia visual y el layout de toda la aplicación.
- * La estrategia aquí es usar un enfoque directo y funcional, con clases de utilidad
- * y selectores simples, lo cual es apropiado para una aplicación de gestión interna
- * de este tamaño. No se utiliza un framework CSS complejo como Bootstrap o Tailwind,
- * lo que mantiene el código ligero pero requiere una definición manual de los estilos.
- *
- * Estructura y Metodología:
- * El CSS está organizado de forma semántica, comenzando por los estilos globales (body),
- * seguido por los componentes de layout principales (container, header), y luego
- * los componentes específicos (tablas, botones, formularios, modales).
- * Se utiliza una nomenclatura de clases basada en componentes (ej. .form-group) y
- * modificadores (ej. .btn-primary) que recuerda a metodologías como BEM,
- * aunque no se aplique de forma estricta.
- */
-
-/* === ESTILOS GLOBALES Y TIPOGRAFÍA === */
-/* Buena práctica: Se define una base tipográfica consistente para toda la aplicación. */
-body {
-  /*
-   * Justificación Técnica (font-family):
-   * Se utiliza una "pila de fuentes" (font stack) moderna y segura para el sistema.
-   * '-apple-system' y 'BlinkMacSystemFont' apuntan a la fuente del sistema en macOS (San Francisco)
-   * y Chrome en macOS. 'Segoe UI' es la fuente del sistema en Windows. 'Roboto' es un fallback
-   * excelente para Android y sistemas Linux. 'Helvetica Neue' y 'Arial' son fallbacks
-   * muy seguros, y 'sans-serif' es el último recurso genérico.
-   * Esto asegura que la aplicación se vea nativa y de alto rendimiento en cualquier sistema operativo.
-   */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  background-color: #f8f9fa; /* Un gris muy claro para el fondo, reduce la fatiga visual. */
-  color: #343a40; /* Un negro suave en lugar de #000, mejora la legibilidad. */
-  line-height: 1.5; /* Espaciado de línea generoso para una fácil lectura de párrafos. */
-  margin: 0; /* Resetea el margen por defecto del body para un control total del layout. */
+:root {
+  --color-primary: #007bff; /* Azul corporativo, quizás el del login */
+  --color-primary-dark: #0056b3;
+  --color-secondary: #6c757d; /* Gris para botones secundarios, etc. */
+  --color-text-dark: #343a40; /* Texto principal */
+  --color-text-light: #6c757d; /* Texto secundario o descriptivo */
+  --color-background-light: #f8f9fa; /* Fondo general */
+  --color-card-background: #ffffff; /* Fondo de tarjetas */
+  --color-success: #28a745; /* Verde para estados de éxito */
+  --color-warning: #ffc107; /* Amarillo/Naranja para estados pendientes */
+  --color-danger: #dc3545; /* Rojo para estados de error/rechazo */
+  --border-radius-base: 8px; /* Radio de bordes para elementos */
+  --spacing-xs: 8px;
+  --spacing-sm: 15px;
+  --spacing-md: 25px;
+  --spacing-lg: 40px;
+}
+/* --- Header de la Aplicación --- */
+.app-header {
+  background-color: var(
+    --color-card-background
+  ); /* Fondo claro, como las cards */
+  border-bottom: 1px solid #eee; /* Línea sutil en la parte inferior */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Sombra ligera para elevación */
+  padding: var(--spacing-sm) var(--spacing-md); /* Espaciado interno */
+  margin-bottom: var(--spacing-lg); /* Espacio antes del contenido principal */
 }
 
-/* === LAYOUT PRINCIPAL === */
-
-/*
- * .container: Define el contenedor principal centrado.
- * Es un patrón de diseño de layout muy común.
- */
-.container {
-  max-width: 1100px; /* Limita el ancho en pantallas grandes para evitar que las líneas de texto sean demasiado largas. */
-  margin: 20px auto; /* Centra el contenedor horizontalmente. */
-  background: #fff;
-  padding: 25px;
-  border-radius: 8px; /* Bordes redondeados para una apariencia más suave y moderna. */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil que eleva el contenedor del fondo. */
+.header-container {
+  max-width: 1400px; /* Ancho máximo igual al del main-dashboard-wrapper */
+  margin: 0 auto; /* Centra el contenido del header */
+  display: flex; /* Para poner logo, nav y user-info en la misma fila */
+  justify-content: space-between; /* Distribuye el espacio entre los elementos */
+  align-items: center; /* Alinea verticalmente al centro */
+  flex-wrap: wrap; /* Permite que los elementos se apilen en pantallas pequeñas */
 }
-header {
-  padding-bottom: 15px;
-  border-bottom: 1px solid #dee2e6; /* Separador visual claro. */
-  margin-bottom: 20px;
+
+/* --- Brand/Logo --- */
+.app-brand {
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
-header h1 {
-  margin: 0; /* Reseteo para evitar espaciados indeseados. */
-  color: #0056b3; /* Un azul corporativo para el título principal. */
-}
-.user-info span {
-  font-weight: bold;
-  margin-right: 15px;
-}
-.user-info a {
-  color: #007bff;
-  text-decoration: none; /* Buena práctica: los enlaces de navegación no suelen necesitar subrayado. */
+
+.app-brand a {
+  text-decoration: none; /* Quita el subrayado del enlace del logo */
+  color: inherit; /* Hereda el color del texto */
+  display: flex; /* Para alinear icono y texto del h1 */
+  align-items: center;
 }
 
-/* === COMPONENTES === */
+.app-logo-icon {
+  font-size: 1.8em; /* Tamaño del icono del logo */
+  color: var(--color-primary); /* Color corporativo para el icono */
+  margin-right: 10px; /* Espacio entre icono y título */
+}
 
-/* Tablas */
-table {
-  width: 100%; /* La tabla ocupa todo el ancho disponible en su contenedor. */
-  border-collapse: collapse; /* Une los bordes de las celdas. */
-  margin-top: 20px;
-  font-size: 0.95rem; /* Ligeramente más pequeño para un look más denso y profesional */
-}
-th,
-td {
-  padding: 12px; /* Espaciado interno generoso para no ahogar el contenido. */
-  text-align: left; /* Alineación estándar para texto en la mayoría de los idiomas occidentales. */
-  border-bottom: 1px solid #e9ecef; /* Solo bordes horizontales para un look moderno */
-}
-th {
-  background-color: #e9ecef; /* Un fondo ligeramente diferente para las cabeceras de la tabla. */
+.app-brand h1 {
+  font-size: 1.5em; /* Tamaño del título del sistema */
+  color: var(--color-text-dark); /* Color oscuro para el texto del título */
+  margin: 0; /* Elimina márgenes por defecto del h1 */
   font-weight: 600;
-  color: #495057;
-}
-tbody tr:hover {
-  background-color: #f8f9fa; /* Resaltado sutil al pasar el ratón */
 }
 
-/* Botones (Clase de utilidad base) */
-.btn {
-  /* Esta es una clase base. Define todos los estilos comunes a todos los botones. */
-  border: none;
-  padding: 10px 20px;
-  color: white;
-  cursor: pointer;
-  border-radius: 5px;
-  font-size: 16px;
-  /* Animación sutil al pasar el ratón, mejora la experiencia de usuario. */
-  transition: background-color 0.2s;
-}
-.btn i {
-  margin-right: 8px; /* Espacio entre el icono y el texto del botón */
-}
-.btn:hover {
-  /* Efecto al pasar el ratón. Usar 'opacity' es una forma simple y efectiva. */
-  opacity: 0.9;
-}
-
-/* Modificadores de Botón */
-/* Estas clases se AÑADEN a la clase .btn para cambiar solo el color. */
-.btn-primary {
-  background-color: #007bff;
-}
-.btn-success {
-  background-color: #28a745;
-}
-.btn-danger {
-  background-color: #dc3545;
-}
-.btn-secondary {
-  background-color: #6c757d;
-}
-
-/* Modificador para botones deshabilitados */
-.btn:disabled {
-  background-color: #9ea7b0; /* Un gris más claro para indicar que está inactivo */
-  opacity: 0.7;
-  cursor: not-allowed;
-  /* Se quita el efecto hover para botones deshabilitados */
-  pointer-events: none;
-}
-
-/* Modificador para botones grandes */
-.btn-lg {
-  padding: 15px 30px;
-  font-size: 1.1rem;
-  border-radius: 8px;
-}
-
-/* === ESTILOS PARA EL DASHBOARD === */
-
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.dashboard-header h2 {
+/* --- Navegación Principal --- */
+.main-nav ul {
+  list-style: none; /* Quita los puntos de la lista */
   margin: 0;
-  color: #343a40;
+  padding: 0;
+  display: flex; /* Para poner los ítems del menú en fila */
+  gap: var(--spacing-md); /* Espacio entre los elementos del menú */
 }
 
-/* Contenedor de tarjetas */
-.card-container {
-  display: grid;
-  /* Crea columnas responsivas: intentará que midan 280px, pero se ajustarán para llenar el espacio. */
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px; /* Espacio entre las tarjetas */
-  margin-top: 20px;
+.nav-link {
+  text-decoration: none;
+  color: var(--color-text-light); /* Color de texto suave para los enlaces */
+  font-weight: 500;
+  padding: 8px 12px; /* Padding para hacer los enlaces más clickeables */
+  border-radius: var(--border-radius-base);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs); /* Espacio entre icono y texto en el enlace */
 }
 
-/* Estilo base de la tarjeta */
-.card {
-  background: #fff;
-  border: 1px solid #e9ecef;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+.nav-link:hover,
+.nav-link.active {
+  /* Para un estado "activo" si lo implementas */
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.nav-link i {
+  font-size: 1.1em; /* Tamaño de los iconos de navegación */
+}
+
+/* --- Información de Usuario y Acciones --- */
+.user-profile-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md); /* Espacio entre el texto de bienvenida y el botón */
+  flex-wrap: wrap; /* Permite que se apile en móviles */
+  justify-content: flex-end; /* Alinea a la derecha en caso de envoltura */
+}
+
+.user-welcome-text {
+  font-weight: 500;
+  color: var(--color-text-dark);
+  white-space: nowrap; /* Evita que el texto de bienvenida se rompa */
+}
+
+.btn-logout {
+  background-color: var(
+    --color-secondary
+  ); /* Un color secundario para el botón de logout */
+  color: white;
+  padding: 8px 15px;
+  font-size: 0.9em;
+  text-decoration: none; /* Para el enlace de botón */
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.btn-logout:hover {
+  background-color: darken(
+    var(--color-secondary),
+    10%
+  ); /* Oscurece al pasar el ratón */
+}
+
+/* --- Media Queries para Responsividad del Header --- */
+@media (max-width: 992px) {
+  .header-container {
+    flex-direction: column; /* Apila logo, nav y user-info */
+    align-items: flex-start; /* Alinea todo a la izquierda cuando se apila */
+    gap: var(--spacing-md);
+  }
+
+  .app-brand {
+    width: 100%; /* Ocupa todo el ancho */
+    justify-content: center; /* Centra el logo en móvil */
+  }
+
+  .main-nav {
+    width: 100%; /* La navegación ocupa todo el ancho */
+    justify-content: center; /* Centra los enlaces del menú */
+  }
+
+  .main-nav ul {
+    flex-wrap: wrap; /* Permite que los ítems del menú se envuelvan */
+    justify-content: center;
+    gap: var(--spacing-sm);
+  }
+
+  .user-profile-actions {
+    width: 100%;
+    justify-content: center; /* Centra el texto de bienvenida y el botón */
+  }
+}
+
+@media (max-width: 576px) {
+  .app-header {
+    padding: var(
+      --spacing-xs
+    ); /* Reduce el padding del header en pantallas muy pequeñas */
+  }
+
+  .app-brand h1 {
+    font-size: 1.2em; /* Reduce el tamaño del título */
+  }
+
+  .app-logo-icon {
+    font-size: 1.5em;
+  }
+
+  .main-nav ul {
+    flex-direction: column; /* Apila los enlaces del menú para más claridad */
+    align-items: center;
+  }
+
+  .nav-link {
+    padding: 5px 10px;
+    font-size: 0.9em;
+  }
+}
+/* --- Layout General --- */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--color-text-dark);
+  background-color: var(--color-background-light);
+  margin: 0;
+  padding: 0;
+}
+
+.main-dashboard-wrapper {
+  /* Si el dashboard completo necesita un ancho máximo, aquí lo defines */
+  max-width: 1400px;
+  margin: 0 auto; /* Centra el contenido */
+  padding: var(--spacing-sm); /* Espaciado general alrededor del contenido */
+}
+
+/* --- Hero Section --- */
+.hero-section {
+  display: flex; /* Contenedor Flex para .hero-content y .hero-illustration */
+  align-items: center; /* Alinea verticalmente al centro */
+  gap: var(--spacing-lg); /* Espacio entre el texto/formulario y la imagen */
+  background-color: var(--color-card-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-base);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: var(--spacing-lg); /* Espacio debajo de la sección hero */
+
+  /* Responsividad básica para pantallas pequeñas */
+  flex-wrap: wrap; /* Permite que los elementos se apilen en pantallas pequeñas */
+  justify-content: center; /* Centra los elementos al apilarse */
+}
+
+.hero-content {
+  flex: 1; /* Permite que crezca */
+  min-width: 300px; /* Ancho mínimo para evitar que se comprima demasiado */
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  gap: var(
+    --spacing-md
+  ); /* Espacio entre los bloques principales (texto+stats y formulario) */
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.card-header {
-  background-color: #f8f9fa;
-  padding: 15px 20px;
-  border-bottom: 1px solid #e9ecef;
-  border-radius: 12px 12px 0 0;
-}
-.card-header h4 {
-  margin: 0;
-  color: #0056b3;
-  font-size: 1rem;
-}
-.card-header span {
-  font-size: 0.9rem;
-  color: #6c757d;
-}
-
-.card-body {
-  padding: 25px 20px;
-  text-align: center;
-  flex-grow: 1; /* Hace que esta sección ocupe el espacio disponible */
-}
-.card-body .days-available {
-  font-size: 3rem;
-  font-weight: 700;
-  color: #28a745;
-  margin: 0;
-}
-.card-body .days-label {
-  margin: 0;
-  color: #6c757d;
-}
-
-.card-footer {
-  padding: 15px 20px;
-  background-color: #f8f9fa;
-  border-top: 1px solid #e9ecef;
-  border-radius: 0 0 12px 12px;
-  text-align: center;
-}
-
-/* Modificador para botones pequeños */
-.btn-sm {
-  padding: 5px 10px;
-  font-size: 14px;
-}
-
-.info-card {
-  padding: 20px;
-  text-align: center;
-  color: #6c757d;
-  background-color: #f8f9fa;
-}
-
-/* Formularios */
-#form-container {
-  /* Estilos para el contenedor del formulario que se muestra/oculta. */
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: #f9f9f9;
-}
-.form-group {
-  /* Agrupa una etiqueta y su campo de entrada, facilitando el espaciado. */
-  margin-bottom: 15px;
-  position: relative; /* Necesario para posicionar el icono del ojo dentro del grupo */
-}
-.form-group label {
-  display: block; /* Asegura que la etiqueta ocupe su propia línea. */
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-.form-group input[type="text"],
-.form-group input[type="password"],
-.form-group input[type="date"],
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 10px;
-  /* Justificación Técnica (box-sizing): 'border-box' es una práctica esencial.
-   * Hace que el 'padding' y el 'border' se incluyan DENTRO del 'width' del elemento,
-   * en lugar de sumarse a él. Esto simplifica enormemente los cálculos de layout. */
-  box-sizing: border-box;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-}
-.form-group input:disabled {
-  /* Estilo visual para campos no editables, mejora la usabilidad. */
-  background-color: #e9ecef;
-}
-.form-actions {
-  /* Contenedor para los botones de acción del formulario. */
-  margin-top: 20px;
-  text-align: right; /* Alinea los botones a la derecha, una convención común. */
-}
-.form-actions button {
-  margin-left: 10px; /* Espaciado entre botones. */
-}
-
-/*
- * Clase de utilidad para Accesibilidad (Screen-reader only).
- * Oculta un elemento visualmente, pero lo mantiene accesible para lectores de pantalla.
- * Esencial para usar placeholders sin perder la accesibilidad de las etiquetas <label>.
- */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-/* Indicadores de Estado (Status Badges) */
-.status {
-  padding: 5px 10px;
-  color: black; /* Color de texto por defecto, aunque se sobreescribe abajo. */
-  border-radius: 15px; /* Bordes muy redondeados para una apariencia de "píldora". */
-  font-size: 0.85em;
-  text-align: center;
-}
-
-/*
- * Justificación Técnica (Selectores de Modificador):
- * Se usa el patrón `.clase-base.modificador`. Por ejemplo, `.status.rechazada`.
- * Esto asegura que el estilo del modificador solo se aplique a elementos que ya tienen
- * la clase base `.status`. Es más específico y robusto que tener solo `.rechazada`.
- */
-
-.status.esperando-aprobacion-coordinador,
-.status.esperando-aprobacion-jefe-de-area {
-  background-color: #ffc107; /* Amarillo/Naranja para "pendiente". */
-  color: #333; /* Texto oscuro para una mejor legibilidad sobre un fondo claro. */
-}
-.status.vacaciones-autorizadas {
-  background-color: #28a745; /* Verde para "éxito". */
-}
-.status.rechazada {
-  background-color: #dc3545; /* Rojo para "error" o "rechazo". */
-}
-
-/* Ventana Modal */
-#decision-modal {
-  display: none; /* Oculto por defecto. JavaScript lo cambiará a 'block' o 'flex'. */
-  position: fixed; /* Lo saca del flujo normal del documento y lo posiciona relativo a la ventana del navegador. */
-  z-index: 1000; /* Un z-index alto para asegurar que se muestre por encima de todo lo demás. */
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.5
-  ); /* Fondo semitransparente para enfocar la atención en el modal. */
-}
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto; /* Centrado vertical (aproximado) y horizontal. */
-  padding: 20px;
-  border: 1px solid #888;
-  width: 500px;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  /* Mejora posible: Usar Flexbox o Grid en el contenedor del modal (#decision-modal) para un centrado vertical y horizontal perfecto y moderno. */
-}
-.close-modal {
-  color: #aaa;
-  float: right; /* Método tradicional para alinear a la derecha. Flexbox sería más moderno. */
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-/* Contenedor específico para la página de Login */
-/* === ESTILOS ESPECÍFICOS PARA LA PÁGINA DE LOGIN (MODERNIZADO) === */
-
-/*
- * Justificación Técnica (Centrado con Flexbox):
- * Usamos Flexbox en el body para lograr un centrado vertical y horizontal perfecto.
- * 'display: flex' activa el modelo de caja flexible.
- * 'align-items: center' centra los ítems en el eje transversal (verticalmente).
- * 'justify-content: center' centra los ítems en el eje principal (horizontalmente).
- * 'min-height: 100vh' asegura que el body ocupe al menos toda la altura de la ventana,
- * lo que es crucial para que el centrado vertical funcione correctamente.
- */
-body.login-page {
+.hero-text-and-stats {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  background-image: url("https://res.cloudinary.com/dfed81ssz/image/upload/v1751995141/bg_uyq5dx.jpg");
-  background-size: cover; /* Hace que la imagen cubra toda la pantalla sin deformarse. */
-  background-position: center; /* Centra la imagen en la pantalla. */
-  background-repeat: no-repeat; /* Evita que la imagen se repita si es pequeña. */
-  background-attachment: fixed; /* Fija la imagen para que no se desplace con el contenido. */
-  margin: 0;
-}
-
-/* Se reemplaza el .login-container anterior con esta versión mejorada */
-.login-container {
-  width: 100%;
-  max-width: 400px; /* Ancho máximo para que se vea bien en pantallas más grandes */
-  padding: 40px;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.95
-  ); /* Fondo blanco ligeramente traslúcido */
-  border-radius: 15px; /* Bordes más redondeados */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada para efecto "flotante" */
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  margin: 20px; /* Margen para que no pegue a los bordes en pantallas pequeñas */
-}
-
-.login-container h2 {
-  margin-top: 0;
-  margin-bottom: 25px;
-  color: #333;
-  font-weight: 600;
-}
-
-.error-message {
-  color: #dc3545;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 15px;
-}
-
-.login-container .btn-primary {
-  width: 100%;
-  padding: 12px;
-  font-size: 18px;
-}
-
-.login-container .form-group input {
-  text-align: center;
-}
-
-/* Estilos para el icono de mostrar/ocultar contraseña */
-.toggle-password {
-  position: absolute; /* Lo saca del flujo normal para posicionarlo sobre el input */
-  top: 50%; /* Lo alinea verticalmente al centro */
-  right: 15px; /* Lo posiciona a la derecha del campo */
-  transform: translateY(
-    -50%
-  ); /* Ajuste fino para un centrado vertical perfecto */
-  cursor: pointer;
-  color: #aaa; /* Un color gris suave por defecto */
-  transition: color 0.2s; /* Animación suave para el cambio de color */
-}
-
-.toggle-password:hover {
-  color: #333; /* Se oscurece al pasar el ratón por encima */
-}
-
-.login-footer {
-  margin-top: 20px;
-}
-
-.login-footer a {
-  color: #0056b3;
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.login-footer a:hover {
-  text-decoration: underline;
-}
-
-.success-message {
-  color: #155724;
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 15px;
-}
-/* === ESTILOS INSPIRADOS EN MINTIC (SOLICITANTE DASHBOARD) === */
-
-.dashboard-hero {
-  background: linear-gradient(
-    135deg,
-    #007bff,
-    #00bfff /* Azul principal de Mintic */
-  );
-  color: white;
-  padding: 40px 50px;
-  border-radius: 15px;
-  margin-bottom: 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  flex-direction: column; /* Texto arriba, stats abajo */
+  gap: var(--spacing-sm);
 }
 
 .hero-text {
-  max-width: 60%;
-  gap: 40px;
-  overflow: hidden;
-  position: relative;
-}
-.hero-content {
-  flex: 1 1 60%;
-  z-index: 2;
+  /* Aquí se aplican los estilos de tipografía definidos en el análisis */
 }
 
-.hero-illustration {
-  flex: 1 1 40%;
-  display: flex;
-  align-items: center; /* Centra verticalmente la imagen dentro del contenedor */
-  justify-content: right; /* Mantiene la imagen alineada a la derecha */
-  /* align-self: flex-start;  Puedes eliminar esta línea o mantenerla si hay un propósito específico,
-                             pero align-items en el padre suele ser suficiente para el centrado. */
-}
-
-.hero-illustration img {
-  max-width: 100%;
-  height: auto;
-  max-height: 320px; /* Limita la altura de la ilustración */
-}
-
-.hero-text h2 {
-  font-size: 2.8rem;
+.hero-greeting {
+  font-size: 2.8em; /* Más grande para el saludo principal */
   font-weight: 700;
-  margin-bottom: 10px;
+  color: var(--color-primary-dark); /* Un color fuerte y corporativo */
+  margin: 0; /* Elimina márgenes por defecto del h2 */
 }
 
-.hero-text p {
-  font-size: 1.1rem;
-  opacity: 0.9;
-  max-width: 90%;
+.hero-message {
+  font-size: 1.1em;
+  color: var(--color-text-light);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: flex-start; /* Alinea los stats a la izquierda */
+  padding: var(--spacing-sm) 0;
 }
 
 .hero-days-container {
+  background-color: var(--color-primary); /* Fondo con color corporativo */
+  color: white;
+  padding: 15px 25px;
+  border-radius: var(--border-radius-base);
   display: flex;
-  align-items: baseline;
-  margin-top: 25px;
+  flex-direction: column;
+  align-items: center; /* Centra el número y la etiqueta */
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
 }
 
 .hero-days {
-  font-size: 4rem;
-  font-weight: bold;
-  margin-right: 10px;
-}
-
-.hero-days-label {
-  font-size: 1.5rem;
-  opacity: 0.8;
-}
-/*  Ejemplo para hacer el botón más llamativo (opcional):
-.btn-primary.btn-lg {
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-} */
-/* === ESTILOS PARA TARJETAS DE ESTADÍSTICAS (APROBADOR) === */
-
-.stat-card-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-  margin-bottom: 40px;
-}
-
-.stat-card {
-  display: flex;
-  align-items: center;
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.stat-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.stat-card-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  margin-right: 20px;
-  color: white;
-  font-size: 24px;
-}
-
-.stat-card-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-card-title {
-  color: #6c757d;
-  font-size: 14px;
+  font-size: 3em; /* Número muy grande y visible */
+  line-height: 1;
   margin-bottom: 5px;
 }
 
-.stat-card-value {
-  color: #343a40;
-  font-size: 28px;
-  font-weight: 700;
+.hero-days-label {
+  font-size: 0.8em;
+  text-transform: uppercase;
+  opacity: 0.8;
 }
 
-/* === NUEVO LAYOUT DE DASHBOARD SOLICITANTE === */
+/* --- Formulario Horizontal --- */
+.hero-form-horizontal {
+  display: flex;
+  flex-wrap: wrap; /* Permite que los campos se envuelvan en pantallas pequeñas */
+  gap: var(--spacing-sm); /* Espacio entre los campos y el botón */
+  align-items: flex-end; /* Alinea los elementos en la parte inferior si tienen diferentes alturas */
+  background-color: #f0f8ff; /* Fondo ligeramente diferente para el formulario */
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-base);
+  border: 1px solid #e0f0ff;
+}
 
+.form-group {
+  flex: 1; /* Permite que los grupos de formulario crezcan */
+  min-width: 150px; /* Ancho mínimo para cada campo */
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-size: 0.9em;
+  color: var(--color-text-light);
+  margin-bottom: 5px;
+}
+
+.form-input-date,
+.date-display {
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1em;
+  width: 100%; /* Asegura que el input o display ocupe el ancho completo de su grupo */
+  box-sizing: border-box; /* Incluye padding y border en el width */
+}
+
+.date-display {
+  background-color: #e9ecef; /* Un color de fondo para indicar que es solo display */
+  color: var(--color-text-dark);
+  text-align: center;
+  min-height: 40px; /* Ajusta si es necesario para que sea igual al input */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-help-text {
+  font-size: 0.8em;
+  color: var(--color-text-light);
+  margin-top: 5px;
+  line-height: 1.3;
+}
+
+/* --- Botones --- */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--border-radius-base);
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-lg {
+  padding: 12px 25px;
+  font-size: 1.1em;
+}
+
+/* Iconos dentro de botones */
+.btn i {
+  margin-right: 8px;
+}
+
+/* --- Hero Illustration --- */
+.hero-illustration {
+  flex: 1; /* Permite que crezca */
+  min-width: 300px; /* Ancho mínimo para la imagen */
+  display: flex;
+  align-items: center; /* Centra verticalmente la imagen */
+  justify-content: center; /* Centra horizontalmente la imagen dentro de su contenedor flex */
+}
+
+.hero-illustration img {
+  max-width: 100%; /* Asegura que la imagen sea responsiva */
+  height: auto;
+  display: block; /* Elimina espacio extra debajo de la imagen */
+  border-radius: var(
+    --border-radius-base
+  ); /* Bordes redondeados para la imagen */
+}
+
+/* --- Contenedor Principal (Dashboard Layout) --- */
 .dashboard-layout {
   display: grid;
-  grid-template-columns: 1fr 320px; /* Columna principal flexible y barra lateral de ancho fijo */
-  gap: 30px;
-  margin-top: 40px;
+  grid-template-columns: 3fr 1fr; /* Columna principal 3 partes, sidebar 1 parte */
+  gap: var(--spacing-lg); /* Espacio entre las columnas */
+
+  /* Responsividad */
+  @media (max-width: 992px) {
+    /* Para tablets y pantallas más pequeñas */
+    grid-template-columns: 1fr; /* Apila las columnas verticalmente */
+  }
 }
 
 .dashboard-main {
-  grid-column: 1 / 2;
+  background-color: var(--color-card-background);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-base);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
 .dashboard-sidebar {
-  grid-column: 2 / 3;
+  background-color: var(--color-card-background);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-base);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
 .dashboard-section-title {
-  font-size: 1.5rem;
-  color: #343a40;
+  font-size: 1.6em;
+  color: var(--color-primary-dark);
   margin-top: 0;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-sm);
+  border-bottom: 2px solid #eee; /* Línea sutil bajo el título */
   padding-bottom: 10px;
-  border-bottom: 2px solid #e9ecef;
 }
 
+/* --- Tablas --- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-sm);
+}
+
+th,
+td {
+  text-align: left;
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  text-transform: uppercase;
+  font-size: 0.9em;
+}
+
+tr:hover {
+  background-color: #f5f5f5;
+}
+
+.table-empty-message {
+  text-align: center !important;
+  font-style: italic;
+  color: var(--color-text-light);
+  padding: var(--spacing-md) !important;
+}
+
+.call-to-action-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.call-to-action-link:hover {
+  text-decoration: underline;
+}
+
+/* --- Badges de Estado --- */
+.status-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-transform: capitalize;
+  text-align: center;
+  min-width: 80px; /* Ancho mínimo para consistencia */
+}
+
+/* Colores específicos para los estados */
+.status-aprobado {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.status-pendiente {
+  background-color: var(--color-warning);
+  color: var(--color-text-dark); /* o #333 */
+}
+
+.status-rechazado {
+  background-color: var(--color-danger);
+  color: white;
+}
+
+/* --- Period Cards (Sidebar) --- */
 .period-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: var(--spacing-sm);
 }
 
 .period-card {
   display: flex;
   align-items: center;
-  background-color: #f8f9fa;
-  /* Se añade para alinear el nuevo botón */
-  justify-content: space-between;
-  padding: 15px;
-  border-radius: 10px;
-  border: 1px solid #dee2e6;
+  background-color: var(
+    --color-background-light
+  ); /* Fondo ligeramente diferente para contraste */
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-base);
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
 }
 
 .period-card-icon {
-  font-size: 1.5rem;
-  color: #007bff;
-  margin-right: 15px;
+  font-size: 1.5em;
+  color: var(--color-primary);
+  margin-right: var(--spacing-xs);
 }
 
 .period-card-info {
   display: flex;
   flex-direction: column;
-  flex-grow: 1; /* Permite que la info ocupe el espacio disponible */
 }
 
-.period-card-info strong {
-  font-size: 0.9rem;
-  color: #343a40;
+.period-title {
+  font-weight: 600;
+  color: var(--color-text-dark);
+  font-size: 0.95em;
 }
 
-.period-card-info span {
-  font-size: 0.85rem;
-  color: #6c757d;
-}
-
-.period-card-action {
-  margin-left: 15px;
+.period-dates {
+  font-size: 0.85em;
+  color: var(--color-text-light);
 }
 
 .period-card-empty {
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-radius: 10px;
   text-align: center;
-  color: #6c757d;
-  border: 1px dashed #dee2e6;
+  padding: var(--spacing-md);
+  background-color: #f0f0f0;
+  border-radius: var(--border-radius-base);
+  color: var(--color-text-light);
+  font-style: italic;
 }
 
-/* Estilos para el nuevo modal de solicitud */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgba(0, 0, 0, 0.6);
-  align-items: center;
-  justify-content: center;
+/* --- Responsividad general (ejemplo) --- */
+@media (max-width: 768px) {
+  .hero-section {
+    flex-direction: column; /* Apila hero-content y hero-illustration */
+    align-items: stretch; /* Estira para ocupar el ancho */
+  }
+
+  .hero-illustration {
+    order: -1; /* Pone la imagen arriba en móviles si lo prefieres */
+    margin-bottom: var(--spacing-md);
+  }
+
+  .hero-greeting {
+    font-size: 2em;
+  }
+
+  .hero-message {
+    font-size: 1em;
+  }
+
+  .hero-days {
+    font-size: 2.5em;
+  }
+
+  .hero-form-horizontal {
+    flex-direction: column; /* Apila los campos del formulario */
+    align-items: stretch;
+  }
+
+  .form-group {
+    width: 100%; /* Asegura que cada campo ocupe el 100% en móvil */
+    min-width: unset;
+  }
+
+  .dashboard-layout {
+    grid-template-columns: 1fr; /* Una sola columna para el dashboard */
+  }
+
+  th,
+  td {
+    padding: 8px 10px; /* Reduce padding en tablas para pantallas pequeñas */
+    font-size: 0.9em;
+  }
+
+  .status-badge {
+    font-size: 0.75em;
+    padding: 4px 8px;
+  }
 }
 
-/* Estilos para la lista de periodos disponibles en el Hero */
-.available-periods {
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.available-periods h4 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 15px;
-  opacity: 0.9;
-}
-
-.available-periods ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.available-periods li {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: 1rem;
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 10px 15px;
-  border-radius: 8px;
-}
-
-.available-periods li i {
-  color: #28a745; /* Un verde brillante para indicar disponibilidad */
-  margin-right: 15px;
-  font-size: 1.2rem;
-}
-
-.date-display {
-  display: inline-block;
-  padding: 10px;
-  background-color: #e9ecef;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  min-width: 120px;
-  text-align: center;
-  color: #495057;
-}
-
-.hero-form-horizontal {
-  display: flex;
-  align-items: flex-end; /* Alinea los elementos en la parte inferior */
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-top: 30px;
-  padding: 20px;
-  background-color: rgba(255, 255, 255, 0.2); /* Efecto Glassmorphism */
-  backdrop-filter: blur(10px); /* Desenfoque del fondo */
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3); /* Borde sutil */
-}
-.hero-form-horizontal input[type="date"] {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-.hero-form-horizontal input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) brightness(1.2); /* Hace el icono del calendario blanco y un poco más brillante */
-  cursor: pointer;
-}
-
-.hero-form-horizontal .date-display {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.5);
-}
-
-.hero-form-horizontal .form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0;
-  color: white; /* Color de texto blanco para contraste con el fondo oscuro */
-}
-
-.hero-form-horizontal .form-group label {
-  margin-bottom: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
+/* Pequeños ajustes para pantallas aún más pequeñas */
+@media (max-width: 480px) {
+  .hero-section,
+  .dashboard-main,
+  .dashboard-sidebar {
+    padding: var(--spacing-sm);
+  }
+  .hero-greeting {
+    font-size: 1.8em;
+  }
+  .hero-days {
+    font-size: 2em;
+  }
+  .btn-lg {
+    font-size: 1em;
+    padding: 10px 20px;
+  }
 }
