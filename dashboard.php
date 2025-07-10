@@ -26,7 +26,12 @@ if ($user['rol'] === 'solicitante') {
         // que correspondan a este periodo.
         $total_dias_disponibles += 15;
     }
-
+    // Identificar el periodo de causación más antiguo para pre-seleccionarlo.
+    // Asumimos que getPeriodosCausacion() devuelve los periodos ordenados del más antiguo al más reciente.
+    $periodo_mas_antiguo_id = null;
+    if (!empty($periodos)) {
+        $periodo_mas_antiguo_id = $periodos[0]['id'];
+    }
     // Esta variable de estado también debe calcularse en el controlador, no en la vista.
     $is_disabled = $total_dias_disponibles <= 0;
 

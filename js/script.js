@@ -1,94 +1,65 @@
-// // Archivo: js/script.js
-// $(document).ready(function () {
-//   $("#btn-nueva-solicitud").on("click", function () {
-//     $("#form-container").slideToggle();
-//   });
-//   $("#btn-cancelar").on("click", function () {
-//     $("#form-container").slideUp();
-//   });
-//   $("#form-vacaciones").on("submit", function (e) {
-//     e.preventDefault();
-//     if (new Date($("#fecha_fin").val()) <= new Date($("#fecha_inicio").val())) {
-//       alert("La fecha final debe ser posterior a la fecha de inicio.");
-//       return;
-//     }
-//     $.ajax({
-//       url: "ajax/guardar_solicitud.php",
-//       type: "POST",
-//       data: $(this).serialize(),
-//       dataType: "json",
-//       success: function (response) {
-//         alert(response.message);
-//         if (response.status === "success") window.location.reload();
-//       },
-//       error: function () {
-//         alert("Ocurrió un error de conexión.");
-//       },
-//     });
-//   });
-//   var modal = $("#decision-modal");
-//   $(".btn-decision").on("click", function () {
-//     var solicitudId = $(this).closest("tr").data("id");
-//     var decision = $(this).data("decision");
-//     $("#modal_solicitud_id").val(solicitudId);
-//     $("#modal_decision").val(decision);
-//     $("#modal-title").text("Justificar " + decision);
-//     $("#justificacion")
-//       .val(decision === "Aprobada" ? "Cumple con los requisitos." : "")
-//       .prop("required", decision === "Rechazada");
-//     modal.show();
-//   });
-//   $(".close-modal").on("click", function () {
-//     modal.hide();
-//   });
-//   $("#form-decision").on("submit", function (e) {
-//     e.preventDefault();
-//     $.ajax({
-//       url: "ajax/procesar_aprobacion.php",
-//       type: "POST",
-//       data: $(this).serialize(),
-//       dataType: "json",
-//       success: function (response) {
-//         alert(response.message);
-//         if (response.status === "success") window.location.reload();
-//       },
-//       error: function () {
-//         alert("Ocurrió un error de conexión.");
-//       },
-//     });
-//   });
-// });
-
 $(document).ready(function () {
-  // --- LÓGICA PARA DASHBOARD DEL SOLICITANTE (MODAL) ---
-  const $solicitudModal = $("#solicitud-modal");
-  const $btnNuevaSolicitud = $("#btn-nueva-solicitud");
-  const $btnCancelarSolicitud = $("#btn-cancelar-solicitud");
-  const $closeSolicitudModal = $(".close-modal"); // Corregido de ID a clase
+  const $fechaInicioInput = $("#fecha_inicio_disfrute");
 
-  const closeModal = function () {
-    // Resetea el formulario y se asegura que el select esté habilitado para la próxima vez
-    // Nota: El formulario se llama #form-nueva-solicitud, no #form-vacaciones
-    $("#form-nueva-solicitud")[0].reset();
-    $("#modal_periodo_id").prop("disabled", false);
-    $solicitudModal.hide();
-  };
-  if ($solicitudModal.length) {
-    // Abre el modal desde el botón principal
-    $btnNuevaSolicitud.on("click", function () {
-      $("#modal_periodo_id").val(""); // Limpia el periodo por si se abre genéricamente
-      $solicitudModal.css("display", "flex"); // Usamos flex para centrar el contenido
+  if ($fechaInicioInput.length) {
+    $fechaInicioInput.on("change", function () {
+      const startDateVal = $(this).val();
+      if (!startDateVal) {
+        $("#fecha-fin-display").text("--/--/----");
+        $("#fecha_fin_hidden").val("");
+        return;
+      }
+
+      // Evita problemas de zona horaria tratando la fecha como local
+      const startDate = new Date(startDateVal + "T00:00:00");
+      if (isNaN(startDate.getTime())) return;
+
+      let businessDaysToAdd = 14; // 14 días a sumar al día de inicio para un total de 15
+      let currentDate = new Date(startDate);
+
+      while (businessDaysToAdd > 0) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        let dayOfWeek = currentDate.getDay();
+        // 0 = Domingo, 6 = Sábado. Solo contamos días de Lunes a Viernes.
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+          businessDaysToAdd--;
+        }
+      }
+
+      // Formatear la fecha para mostrar (DD/MM/YYYY)
+      const day = ("0" + currentDate.getDate()).slice(-2);
+      const month = ("0" + (currentDate.getMonth() + 1)).slice(-2);
+      const year = currentDate.getFullYear();
+      const displayDate = `${day}/${month}/${year}`;
+
+      // Formatear la fecha para el input hidden (YYYY-MM-DD)
+      const hiddenDate = `${year}-${month}-${day}`;
+
+      $("#fecha-fin-display").text(displayDate);
+      $("#fecha_fin_hidden").val(hiddenDate);
     });
 
-    // Abre el modal desde un periodo específico en la barra lateral
-    $(".dashboard-sidebar").on("click", ".btn-solicitar-periodo", function () {
-      const periodId = $(this).data("periodo-id");
-      $("#modal_periodo_id").val(periodId);
-      $solicitudModal.css("display", "flex");
+    $("#form-solicitud-directa").on("submit", function (e) {
+      e.preventDefault();
+      $.ajax({
+        url: "ajax/crear_solicitud.php", // Endpoint para procesar la nueva solicitud
+        type: "POST",
+        data: $(this).serialize(),
+        dataType: "json",
+        success: function (response) {
+          alert(response.message);
+          if (response.status === "success") {
+            window.location.reload(); // Recargar para ver la nueva solicitud en el historial
+          }
+        },
+        error: function () {
+          alert(
+            "Ocurrió un error al conectar con el servidor. Inténtalo de nuevo."
+          );
+        },
+      });
     });
-    $closeSolicitudModal.on("click", closeModal);
-    $btnCancelarSolicitud.on("click", closeModal);
   }
-  // --- LÓGICA PARA DASHBOARD DEL APROBADOR (MODAL) ---
-  // (El resto del código del aprobador iría aquí)
 });
+// --- LÓGICA PARA DASHBOARD DEL APROBADOR (MODAL) ---
+// (El resto del código del aprobador iría aquí)

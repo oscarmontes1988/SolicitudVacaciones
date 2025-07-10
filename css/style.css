@@ -735,3 +735,30 @@ body.login-page {
   margin-right: 15px;
   font-size: 1.2rem;
 }
+
+.hero-form-horizontal {
+  display: flex;
+  align-items: flex-end;
+  /* Alinea los elementos en la parte inferior para que el botón y los inputs queden alineados */
+  gap: 20px;
+  /* Espacio entre los grupos de formulario */
+  flex-wrap: wrap;
+  /* Permite que los elementos se ajusten en pantallas pequeñas */
+  margin-top: 25px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.hero-form-horizontal .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.hero-form-horizontal .form-group label {
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
