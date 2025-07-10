@@ -744,6 +744,12 @@ tr:hover {
   }
 }
 
+/* --- Mensajes de Alerta/Info (Añadir a tus estilos de .alert) --- */
+.alert-info {
+  background-color: #d1ecf1; /* Un color de fondo azul claro */
+  color: #0c5460; /* Texto azul oscuro */
+  border: 1px solid #bee5eb;
+}
 /* --- Responsividad general --- */
 @media (max-width: 768px) {
   .hero-section {

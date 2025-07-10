@@ -2,7 +2,6 @@
 // Archivo: forgot_password.php
 
 use PHPMailer\PHPMailer\PHPMailer;
-// Se usa un alias para la clase Exception de PHPMailer para evitar conflictos con la clase Exception global de PHP.
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 /**
@@ -34,24 +33,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = getUserByUsername($conn, $username);
 
     if ($user && !empty($user['email'])) {
-        // El usuario existe y tiene un email registrado.
         $obscured_email = obscure_email($user['email']);
         $message = "Si los datos son correctos, hemos enviado un enlace a <strong>" . htmlspecialchars($obscured_email) . "</strong> para restablecer tu contraseña.";
         $message_type = 'success';
 
-        // 1. Generar un token seguro
         $token = bin2hex(random_bytes(32));
-        // 2. Establecer una fecha de expiración (ej. 1 hora desde ahora)
         $expires_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
-        // 3. Guardar el token y la fecha en la base de datos
         setResetToken($conn, $user['id'], $token, $expires_at);
 
-        // 4. Enviar el correo electrónico real con PHPMailer
         $reset_link = "http://localhost/Solicitud_Vacaciones/reset_password.php?token=" . $token;
         $mail = new PHPMailer(true);
 
         try {
-            // Configuración del servidor
             $mail->isSMTP();
             $mail->Host = MAIL_HOST;
             $mail->SMTPAuth = true;
@@ -61,11 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->Port = MAIL_PORT;
             $mail->CharSet = 'UTF-8';
 
-            // Destinatarios
             $mail->setFrom(MAIL_FROM_ADDRESS, MAIL_FROM_NAME);
             $mail->addAddress($user['email'], $user['nombre_completo']);
 
-            // Contenido
             $mail->isHTML(true);
             $mail->Subject = 'Restablecimiento de contraseña';
             $mail->Body = "Hola " . htmlspecialchars($user['nombre_completo']) . ",<br><br>Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar:<br><a href='{$reset_link}'>Restablecer mi contraseña</a><br><br>Si no solicitaste esto, puedes ignorar este correo.<br><br>Saludos,<br>El equipo del Sistema de Vacaciones.";
@@ -73,14 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $mail->send();
         } catch (PHPMailerException $e) {
-            // No mostramos el error al usuario por seguridad, pero lo registramos para el desarrollador.
             error_log("El mensaje no pudo ser enviado. Mailer Error: {$mail->ErrorInfo}");
         }
     } else {
-        // Para no revelar si un usuario existe (seguridad), mostramos un mensaje genérico.
-        // El atacante no sabrá si el fallo fue por un usuario inexistente o un usuario sin email.
+        // Mensaje genérico por seguridad
         $message = 'Si tu usuario está registrado en nuestro sistema, recibirás un correo con las instrucciones.';
-        $message_type = 'success';
+        $message_type = 'success'; // Mostrar como éxito incluso si el usuario no existe para no dar pistas a atacantes
     }
 }
 ?>
@@ -90,31 +79,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restablecer Contraseña</title>
+    <title>Restablecer Contraseña - Sistema de Vacaciones</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body class="login-page">
-    <div class="login-container">
-        <h2>Restablecer Contraseña</h2>
-        <p>Ingresa tu nombre de usuario y te enviaremos un enlace a tu correo registrado para restablecer la contraseña.</p>
-
-        <?php if (!empty($message)): ?>
-            <p class="<?php echo $message_type === 'success' ? 'success-message' : 'error-message'; ?>">
-                <?php echo $message; // Usamos echo sin htmlspecialchars porque el mensaje puede contener HTML (<strong>, <a>) 
-                ?>
-            </p>
-        <?php endif; ?>
-
-        <form method="POST" action="forgot_password.php">
-            <div class="form-group">
-                <label for="username" class="sr-only">Nombre de usuario:</label>
-                <input type="text" id="username" name="username" placeholder="Nombre de usuario" required>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-key login-icon"></i>
+                <h2 class="login-title">¿Olvidaste tu Contraseña?</h2>
+                <p class="login-subtitle">Ingresa tu nombre de usuario y te enviaremos un enlace a tu correo registrado.</p>
             </div>
-            <button type="submit" class="btn btn-primary">Enviar Enlace</button>
-        </form>
-        <div class="login-footer">
-            <a href="login.php">Volver al inicio de sesión</a>
+
+            <?php if (!empty($message)) : ?>
+                <p class="alert <?php echo $message_type === 'success' ? 'alert-info' : 'alert-danger'; ?>">
+                    <?php echo $message; // No htmlspecialchars aquí porque puede contener HTML (<strong>) 
+                    ?>
+                </p>
+            <?php endif; ?>
+
+            <form method="POST" action="forgot_password.php" class="login-form">
+                <div class="form-group-login"> <label for="username" class="sr-only">Nombre de usuario:</label>
+                    <div class="input-icon-group">
+                        <i class="fas fa-user icon-left"></i>
+                        <input type="text" id="username" name="username" placeholder="Nombre de usuario" required class="form-input-login">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    Enviar Enlace de Restablecimiento
+                </button>
+            </form>
+
+            <div class="login-footer"> <a href="login.php" class="forgot-password-link">Volver al inicio de sesión</a>
+            </div>
         </div>
     </div>
 </body>
