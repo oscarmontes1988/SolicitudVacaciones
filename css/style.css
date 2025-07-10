@@ -79,17 +79,23 @@ header h1 {
 /* Tablas */
 table {
   width: 100%; /* La tabla ocupa todo el ancho disponible en su contenedor. */
-  border-collapse: collapse; /* Une los bordes de las celdas para una apariencia limpia. */
+  border-collapse: collapse; /* Une los bordes de las celdas. */
   margin-top: 20px;
+  font-size: 0.95rem; /* Ligeramente más pequeño para un look más denso y profesional */
 }
 th,
 td {
-  border: 1px solid #dee2e6; /* Bordes suaves para las celdas. */
   padding: 12px; /* Espaciado interno generoso para no ahogar el contenido. */
   text-align: left; /* Alineación estándar para texto en la mayoría de los idiomas occidentales. */
+  border-bottom: 1px solid #e9ecef; /* Solo bordes horizontales para un look moderno */
 }
 th {
   background-color: #e9ecef; /* Un fondo ligeramente diferente para las cabeceras de la tabla. */
+  font-weight: 600;
+  color: #495057;
+}
+tbody tr:hover {
+  background-color: #f8f9fa; /* Resaltado sutil al pasar el ratón */
 }
 
 /* Botones (Clase de utilidad base) */
@@ -475,10 +481,10 @@ body.login-page {
   background: linear-gradient(
     135deg,
     #007bff,
-    #00bfff
-  ); /* Azul principal de Mintic */
+    #00bfff /* Azul principal de Mintic */
+  );
   color: white;
-  padding: 60px 40px;
+  padding: 40px 50px;
   border-radius: 15px;
   margin-bottom: 40px;
   display: flex;
@@ -489,22 +495,46 @@ body.login-page {
 
 .hero-text {
   max-width: 60%;
+  gap: 40px;
+  overflow: hidden;
+  position: relative;
+}
+.hero-content {
+  flex: 1 1 60%;
+  z-index: 2;
+}
+
+.hero-illustration {
+  flex: 1 1 40%;
+  display: flex;
+  align-items: center; /* Centra verticalmente la imagen dentro del contenedor */
+  justify-content: right; /* Mantiene la imagen alineada a la derecha */
+  /* align-self: flex-start;  Puedes eliminar esta línea o mantenerla si hay un propósito específico,
+                             pero align-items en el padre suele ser suficiente para el centrado. */
+}
+
+.hero-illustration img {
+  max-width: 100%;
+  height: auto;
+  max-height: 320px; /* Limita la altura de la ilustración */
 }
 
 .hero-text h2 {
-  font-size: 2.5rem;
+  font-size: 2.8rem;
+  font-weight: 700;
   margin-bottom: 10px;
 }
 
 .hero-text p {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   opacity: 0.9;
+  max-width: 90%;
 }
 
 .hero-days-container {
   display: flex;
   align-items: baseline;
-  margin-top: 20px;
+  margin-top: 25px;
 }
 
 .hero-days {
@@ -517,30 +547,6 @@ body.login-page {
   font-size: 1.5rem;
   opacity: 0.8;
 }
-
-.mintic-btn {
-  background-color: #28a745; /* Verde para acciones positivas */
-  border: none;
-  padding: 15px 30px;
-  font-size: 1.2rem;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
-}
-
-.mintic-btn:hover {
-  background-color: #218838; /* Verde más oscuro al pasar el ratón */
-}
-
-.hero-image {
-  /* Por ahora, solo un contenedor.  En el futuro, añadiríamos la imagen aquí como fondo o <img> */
-  width: 35%;
-  /*  Si tuvieras una imagen SVG:
-  background-image: url('img/vacaciones.svg');  
-  background-size: contain;
-  background-repeat: no-repeat;
-  */
-}
-
 /*  Ejemplo para hacer el botón más llamativo (opcional):
 .btn-primary.btn-lg {
   animation: pulse 2s infinite;
@@ -736,25 +742,51 @@ body.login-page {
   font-size: 1.2rem;
 }
 
+.date-display {
+  display: inline-block;
+  padding: 10px;
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  min-width: 120px;
+  text-align: center;
+  color: #495057;
+}
+
 .hero-form-horizontal {
   display: flex;
-  align-items: flex-end;
-  /* Alinea los elementos en la parte inferior para que el botón y los inputs queden alineados */
+  align-items: flex-end; /* Alinea los elementos en la parte inferior */
   gap: 20px;
-  /* Espacio entre los grupos de formulario */
   flex-wrap: wrap;
-  /* Permite que los elementos se ajusten en pantallas pequeñas */
-  margin-top: 25px;
+  margin-top: 30px;
   padding: 20px;
-  background-color: #f8f9fa;
+  background-color: rgba(255, 255, 255, 0.2); /* Efecto Glassmorphism */
+  backdrop-filter: blur(10px); /* Desenfoque del fondo */
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Borde sutil */
+}
+.hero-form-horizontal input[type="date"] {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.hero-form-horizontal input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.2); /* Hace el icono del calendario blanco y un poco más brillante */
+  cursor: pointer;
+}
+
+.hero-form-horizontal .date-display {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .hero-form-horizontal .form-group {
   display: flex;
   flex-direction: column;
   margin-bottom: 0;
+  color: white; /* Color de texto blanco para contraste con el fondo oscuro */
 }
 
 .hero-form-horizontal .form-group label {
