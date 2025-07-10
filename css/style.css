@@ -538,7 +538,213 @@ tr:hover {
   font-style: italic;
 }
 
-/* --- Responsividad general (ejemplo) --- */
+/* --- Login Page Styles --- */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Ocupa al menos el alto total de la ventana */
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-dark)
+  ); /* Gradiente sutil */
+  padding: var(--spacing-md);
+  box-sizing: border-box; /* Asegura que el padding no cause desbordamiento */
+}
+
+.login-wrapper {
+  /* Este contenedor puede ayudar si necesitas centrar el formulario en una sección específica */
+  max-width: 450px; /* Ancho máximo para el formulario de login */
+  width: 100%;
+}
+
+.login-card {
+  background-color: var(--color-card-background);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-base);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada para la tarjeta de login */
+  text-align: center;
+}
+
+.login-header {
+  margin-bottom: var(--spacing-md);
+}
+
+.login-icon {
+  font-size: 4em; /* Icono grande y llamativo */
+  color: var(--color-primary); /* Color corporativo */
+  margin-bottom: var(--spacing-xs);
+}
+
+.login-title {
+  font-size: 2em;
+  color: var(--color-text-dark);
+  margin-top: 0;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+.login-subtitle {
+  font-size: 1em;
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-md);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm); /* Espacio entre grupos de formulario */
+}
+
+/* Reutilizando form-group de dashboard, pero con ajustes para login */
+.form-group-login {
+  position: relative; /* Para posicionar el icono dentro del input */
+  margin-bottom: var(--spacing-sm); /* Espacio entre campos */
+}
+
+.input-icon-group {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ced4da;
+  border-radius: var(
+    --border-radius-base
+  ); /* Bordes redondeados para el input */
+  padding-right: var(--spacing-xs); /* Espacio para el icono del ojo */
+  background-color: #fff;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-icon-group:focus-within {
+  /* Estilo al enfocar el input */
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.icon-left {
+  padding: 0 var(--spacing-xs);
+  color: var(--color-text-light);
+}
+
+.form-input-login {
+  flex-grow: 1; /* Permite que el input ocupe el espacio restante */
+  padding: 10px 0; /* Padding vertical, padding horizontal lo da el icono */
+  border: none;
+  outline: none; /* Quita el outline por defecto al enfocar */
+  font-size: 1em;
+  color: var(--color-text-dark);
+  background: transparent; /* Fondo transparente para que el input-icon-group lo maneje */
+}
+
+/* Oculta la etiqueta para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.toggle-password {
+  cursor: pointer;
+  color: var(--color-text-light);
+  font-size: 0.9em;
+  padding-left: var(--spacing-xs);
+}
+
+/* Botón de inicio de sesión */
+.btn-block {
+  width: 100%; /* El botón ocupa todo el ancho */
+  margin-top: var(--spacing-sm);
+  padding: 12px var(--spacing-md); /* Más padding para el botón principal */
+  font-size: 1.1em;
+}
+
+/* Mensajes de error/alerta */
+.alert {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  border-radius: var(--border-radius-base);
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.alert-danger {
+  background-color: #f8d7da; /* Fondo rojo claro */
+  color: #721c24; /* Texto rojo oscuro */
+  border: 1px solid #f5c6cb;
+}
+
+/* Footer del Login */
+.login-footer {
+  margin-top: var(--spacing-md);
+  font-size: 0.9em;
+}
+
+.forgot-password-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: text-decoration 0.3s ease;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+/* Estilos para el spinner de carga en el botón */
+.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Responsividad del Login --- */
+@media (max-width: 576px) {
+  .login-page {
+    padding: var(--spacing-sm);
+  }
+  .login-card {
+    padding: var(--spacing-md);
+  }
+  .login-icon {
+    font-size: 3em;
+  }
+  .login-title {
+    font-size: 1.6em;
+  }
+  .login-subtitle {
+    font-size: 0.9em;
+  }
+  .form-input-login {
+    padding: 8px 0;
+  }
+  .btn-block {
+    padding: 10px var(--spacing-md);
+    font-size: 1em;
+  }
+}
+
+/* --- Responsividad general --- */
 @media (max-width: 768px) {
   .hero-section {
     flex-direction: column; /* Apila hero-content y hero-illustration */

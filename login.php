@@ -11,11 +11,6 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = getUserByUsername($conn, $_POST['username']);
 
-    // --- INICIO DE CÓDIGO DE DEPURACIÓN TEMPORAL ---
-    //var_dump($user);
-    //die(); // Detiene la ejecución para que podamos ver la salida.
-    // --- FIN DE CÓDIGO DE DEPURACIÓN TEMPORAL ---
-    // ¡CORRECCIÓN DE SEGURIDAD CRÍTICA!
     if ($user && password_verify($_POST['password'], $user['password'])) {
         $_SESSION['user'] = $user;
         header('Location: dashboard.php');
@@ -31,50 +26,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema de Vacaciones</title>
+    <title>Login - Sistema de Solicitud de Vacaciones</title>
     <link rel="stylesheet" href="css/style.css">
-    <!-- Se añade Font Awesome para los iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 
 <body class="login-page">
-    <div class="login-container">
-        <h2>Sistema de Vacaciones - Login</h2>
-        <?php if ($error): ?><p class="error-message"><?php echo $error; ?></p><?php endif; ?>
-        <form method="POST" action="login.php">
-            <div class="form-group">
-                <label for="username" class="sr-only">Usuario:</label>
-                <input type="text" id="username" name="username" placeholder="Usuario" required>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="fas fa-plane-departure login-icon"></i>
+                <h2 class="login-title">Bienvenido al Sistema de Vacaciones</h2>
+                <p class="login-subtitle">Inicia sesión para gestionar tus días de descanso.</p>
             </div>
-            <div class="form-group">
-                <label for="password" class="sr-only">Contraseña:</label>
-                <input type="password" id="password" name="password" placeholder="Contraseña" required>
-                <!-- Icono del ojo para mostrar/ocultar contraseña -->
-                <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+
+            <?php if ($error) : ?>
+                <p class="alert alert-danger"><?php echo htmlspecialchars($error); ?></p>
+            <?php endif; ?>
+
+            <form method="POST" action="login.php" class="login-form">
+                <div class="form-group-login">
+                    <label for="username" class="sr-only">Usuario:</label>
+                    <div class="input-icon-group">
+                        <i class="fas fa-user icon-left"></i>
+                        <input type="text" id="username" name="username" placeholder="Usuario" required class="form-input-login">
+                    </div>
+                </div>
+                <div class="form-group-login">
+                    <label for="password" class="sr-only">Contraseña:</label>
+                    <div class="input-icon-group">
+                        <i class="fas fa-lock icon-left"></i>
+                        <input type="password" id="password" name="password" placeholder="Contraseña" required class="form-input-login">
+                        <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" id="loginButton">
+                    <span class="btn-text">Iniciar Sesión</span>
+                    <span class="spinner" style="display: none;"></span> </button>
+            </form>
+
+            <div class="login-footer">
+                <a href="forgot_password.php" class="forgot-password-link">¿Olvidaste tu contraseña?</a>
             </div>
-            <button type="submit" class="btn btn-primary" id="loginButton">
-                <span class="btn-text">Iniciar Sesión</span>
-                <span class="spinner"></span>
-            </button>
-        </form>
-        <div class="login-footer">
-            <a href="forgot_password.php">¿Olvidaste tu contraseña?</a>
         </div>
     </div>
 
     <script>
-        // Seleccionamos el icono y el campo de contraseña
         const togglePassword = document.querySelector('#togglePassword');
-        const password = document.querySelector('#password');
+        const passwordField = document.querySelector('#password');
+        const loginButton = document.querySelector('#loginButton');
+        const btnText = loginButton.querySelector('.btn-text');
+        const spinner = loginButton.querySelector('.spinner');
 
-        // Añadimos un evento de 'click' al icono
-        togglePassword.addEventListener('click', function(e) {
-            // Cambiamos el atributo 'type' del campo de contraseña
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-
-            // Cambiamos el icono del ojo (abierto/cerrado)
+        // Toggle password visibility
+        togglePassword.addEventListener('click', function() {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
             this.classList.toggle('fa-eye-slash');
+        });
+
+        // Add loading state to button on form submission
+        document.querySelector('.login-form').addEventListener('submit', function() {
+            btnText.style.display = 'none';
+            spinner.style.display = 'inline-block'; // Muestra el spinner
+            loginButton.disabled = true; // Deshabilita el botón
         });
     </script>
 </body>
