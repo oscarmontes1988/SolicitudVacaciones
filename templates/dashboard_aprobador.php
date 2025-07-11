@@ -14,7 +14,6 @@
  * Este desacoplamiento es esencial para la mantenibilidad.
  */
 ?>
-
 <div class="dashboard-main-content">
     <h3 class="dashboard-section-title">Solicitudes Pendientes de Aprobación</h3>
 
