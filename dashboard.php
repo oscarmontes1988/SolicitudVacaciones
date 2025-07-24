@@ -1,44 +1,56 @@
 <?php
 // Archivo: dashboard.php
+// Rol: Controlador principal que enruta al usuario a su panel correspondiente.
+
 session_start();
+
+// 1. Verificación de Seguridad
 if (!isset($_SESSION['user'])) {
     header('Location: login.php');
     exit;
 }
+
+// 2. Dependencias
 require_once 'config/database.php';
 require_once 'models/user_model.php';
 require_once 'models/solicitud_model.php';
+
+// 3. Obtiene los datos del usuario
 $user = $_SESSION['user'];
+
+// 4. Carga la cabecera reutilizable
 include 'templates/header.php';
+
+// 5. Lógica de Enrutamiento y Preparación de Datos
 if ($user['rol'] === 'solicitante') {
+
     $periodos = getPeriodosCausacion($conn, $user['id']);
     $solicitudes = getSolicitudesByUser($conn, $user['id']);
+    $total_dias_disponibles = getSaldoVacaciones($conn, $user['id']);
 
-    // Lógica para calcular el total de días disponibles.
-    // Esta variable es requerida por la vista 'dashboard_solicitante.php'.
-    // NOTA: Esta es una lógica de ejemplo y debe ser refinada.
-    // La forma correcta sería calcular los días otorgados por periodo y restar
-    // los días ya tomados en solicitudes 'Aprobada'.
-    $total_dias_disponibles = 0;
-    foreach ($periodos as $periodo) {
-        // Por ahora, sumamos 15 días por cada periodo de causación disponible.
-        // En una implementación real, aquí deberías restar los días de las $solicitudes aprobadas
-        // que correspondan a este periodo.
-        $total_dias_disponibles += 15;
+    // --- CORRECCIÓN: Obtiene festivos para un rango de 30 años ---
+    $currentYear = (int)date('Y');
+    $festivos = [];
+    for ($i = 0; $i < 30; $i++) { // Calcula para el año actual y los 29 siguientes
+        $festivos = array_merge($festivos, getFestivosLeyEmiliani($currentYear + $i));
     }
-    // Identificar el periodo de causación más antiguo para pre-seleccionarlo.
-    // Asumimos que getPeriodosCausacion() devuelve los periodos ordenados del más antiguo al más reciente.
-    $periodo_mas_antiguo_id = null;
-    if (!empty($periodos)) {
-        $periodo_mas_antiguo_id = $periodos[0]['id'];
-    }
-    // Esta variable de estado también debe calcularse en el controlador, no en la vista.
+
+    $periodo_mas_antiguo_id = !empty($periodos) ? $periodos[0]['id'] : null;
     $is_disabled = $total_dias_disponibles <= 0;
 
+    // Carga la plantilla específica para el solicitante
+    // La vista usará las variables $festivos, $total_dias_disponibles, etc.
     include 'templates/dashboard_solicitante.php';
 } elseif ($user['rol'] === 'aprobador') {
+
     $pendientes = getSolicitudesPendientesParaAprobador($conn, $user['cargo']);
+
+    // Carga la plantilla específica para el aprobador
     include 'templates/dashboard_aprobador.php';
 }
+
+// 6. Carga el pie de página reutilizable
 include 'templates/footer.php';
+
+// 7. Cierra la conexión a la base de datos
 $conn->close();

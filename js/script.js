@@ -1,5 +1,5 @@
 // (function($) { // Encapsular con jQuery para evitar conflictos de $ si es necesario
-//     "use strict"; // Activar modo estricto para mejor manejo de errores
+//   "use strict"; // Activar modo estricto para mejor manejo de errores
 
 // ----------------------------------------------------
 // 1. Configuración y Selectores Comunes
@@ -17,10 +17,10 @@ const DOM = {
 };
 
 const CONFIG = {
-  diasVacacionesDefecto: 14, // 14 días a sumar al día de inicio (total 15 días)
+  diasVacacionesDefecto: 15,
   formatoFechaDisplay: "DD/MM/YYYY",
   formatoFechaHidden: "YYYY-MM-DD",
-  urlCrearSolicitud: "ajax/crear_solicitud.php",
+  urlCrearSolicitud: "ajax/guardar_solicitud.php",
 };
 
 // ----------------------------------------------------
@@ -28,24 +28,67 @@ const CONFIG = {
 // ----------------------------------------------------
 
 /**
- * Calcula la fecha de fin sumando días hábiles a una fecha de inicio.
- * @param {Date} startDate - La fecha de inicio.
- * @param {number} daysToAdd - El número de días hábiles a sumar.
- * @returns {Date} La fecha de fin calculada.
+ * Formatea una fecha a un string YYYY-MM-DD para comparaciones.
+ * @param {Date} date - La fecha a formatear.
+ * @returns {string} Fecha formateada.
  */
-function calculateEndDate(startDate, daysToAdd) {
+function formatISODate(date) {
+  const year = date.getFullYear();
+  const month = ("0" + (date.getMonth() + 1)).slice(-2);
+  const day = ("0" + date.getDate()).slice(-2);
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Calcula la fecha de regreso sumando días hábiles, excluyendo festivos.
+ * @param {Date} startDate - La fecha de inicio.
+ * @param {number} businessDays - El número de días hábiles a tomar (ej. 15).
+ * @param {string[]} holidays - Un array de fechas festivas en formato 'YYYY-MM-DD'.
+ * @returns {Date} La fecha de regreso.
+ */
+function calculateReturnDate(startDate, businessDays, holidays) {
   let currentDate = new Date(startDate);
-  let businessDaysAdded = 0;
+  let daysCounted = 0;
 
-  while (businessDaysAdded < daysToAdd) {
-    currentDate.setDate(currentDate.getDate() + 1); // Avanza un día
-    let dayOfWeek = currentDate.getDay(); // 0 = Domingo, 6 = Sábado
+  // Primero, encontrar el último día de vacaciones
+  while (daysCounted < businessDays) {
+    let dayOfWeek = currentDate.getDay(); // 0=Dom, 1=Lun, ..., 6=Sáb
+    let isoDate = formatISODate(currentDate);
 
-    // Si no es sábado (6) ni domingo (0), cuenta como día hábil
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-      businessDaysAdded++;
+    // Si no es domingo (0) ni sábado (6) Y no es un festivo, es un día hábil.
+    if (
+      dayOfWeek !== 0 &&
+      dayOfWeek !== 6 &&
+      holidays.indexOf(isoDate) === -1
+    ) {
+      daysCounted++;
+    }
+
+    // Solo avanzar la fecha si aún no hemos encontrado el último día.
+    if (daysCounted < businessDays) {
+      currentDate.setDate(currentDate.getDate() + 1);
     }
   }
+
+  // Ahora, currentDate contiene el último día de vacaciones.
+  // La fecha de regreso es el siguiente día hábil.
+  currentDate.setDate(currentDate.getDate() + 1);
+
+  while (true) {
+    let returnDayOfWeek = currentDate.getDay();
+    let returnIsoDate = formatISODate(currentDate);
+
+    if (
+      returnDayOfWeek !== 0 &&
+      returnDayOfWeek !== 6 &&
+      holidays.indexOf(returnIsoDate) === -1
+    ) {
+      break; // Es un día hábil, podemos regresar.
+    }
+    // Si no, avanzamos al siguiente día.
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
   return currentDate;
 }
 
@@ -62,25 +105,9 @@ function formatDisplayDate(date) {
 }
 
 /**
- * Formatea una fecha a un string YYYY-MM-DD.
- * @param {Date} date - La fecha a formatear.
- * @returns {string} Fecha formateada para input hidden.
- */
-function formatHiddenDate(date) {
-  const day = ("0" + date.getDate()).slice(-2);
-  const month = ("0" + (date.getMonth() + 1)).slice(-2);
-  const year = date.getFullYear();
-  return `${year}-${month}-${day}`;
-}
-
-/**
  * Muestra una alerta amigable al usuario.
- * @param {string} message - Mensaje a mostrar.
- * @param {string} type - Tipo de alerta ('success', 'error', 'info').
  */
 function showAlert(message, type = "info") {
-  // Implementación simple de alerta.
-  // En un proyecto real, se usaría un componente UI más sofisticado (toast, modal).
   alert(`[${type.toUpperCase()}] ${message}`);
 }
 
@@ -92,8 +119,12 @@ function showAlert(message, type = "info") {
  * Inicializa la funcionalidad de cálculo de fecha de fin de vacaciones.
  */
 function initVacationDateCalculator() {
-  // Solo si el input de fecha de inicio existe en la página
   if (DOM.fechaInicioInput.length) {
+    // CAMBIO: Leer la lista de festivos desde el atributo data-* del formulario.
+    // Esto es más robusto que usar una variable global.
+    const holidaysData = DOM.formSolicitudDirecta.attr("data-festivos");
+    const holidays = holidaysData ? JSON.parse(holidaysData) : [];
+
     DOM.fechaInicioInput.on("change", function () {
       const startDateVal = $(this).val();
 
@@ -103,23 +134,28 @@ function initVacationDateCalculator() {
         return;
       }
 
-      // Importante: Tratar la fecha como local para evitar problemas de zona horaria con input type="date"
       const startDate = new Date(startDateVal + "T00:00:00");
 
       if (isNaN(startDate.getTime())) {
-        // Valida que la fecha sea válida
         showAlert("La fecha de inicio seleccionada no es válida.", "error");
         return;
       }
 
-      const endDate = calculateEndDate(startDate, CONFIG.diasVacacionesDefecto);
+      // La lógica de cálculo ahora usará la lista de festivos leída anteriormente.
+      const returnDate = calculateReturnDate(
+        startDate,
+        CONFIG.diasVacacionesDefecto,
+        holidays
+      );
 
-      DOM.fechaFinDisplay.text(formatDisplayDate(endDate));
-      DOM.fechaFinHidden.val(formatHiddenDate(endDate));
+      // La fecha final para la base de datos es un día antes de la fecha de regreso.
+      let endDate = new Date(returnDate);
+      endDate.setDate(endDate.getDate() - 1);
+
+      DOM.fechaFinDisplay.text(formatDisplayDate(returnDate));
+      DOM.fechaFinHidden.val(formatISODate(endDate));
     });
 
-    // Disparar el evento change al cargar la página si ya hay una fecha pre-seleccionada
-    // Esto asegura que la fecha de fin se calcule al cargar
     if (DOM.fechaInicioInput.val()) {
       DOM.fechaInicioInput.trigger("change");
     }
@@ -132,23 +168,10 @@ function initVacationDateCalculator() {
 function initVacationFormSubmission() {
   if (DOM.formSolicitudDirecta.length) {
     DOM.formSolicitudDirecta.on("submit", function (e) {
-      e.preventDefault(); // Previene el envío por defecto del formulario
+      e.preventDefault();
 
-      // Deshabilitar botón y mostrar spinner (si aplicable)
       const submitButton = $(this).find('button[type="submit"]');
-      const originalButtonText = submitButton.html(); // Guardar el HTML original del botón
-
-      submitButton.prop("disabled", true);
-      // Si el botón tiene elementos de spinner/texto, actualiza
-      const btnTextSpan = submitButton.find(".btn-text");
-      const spinnerSpan = submitButton.find(".spinner");
-      if (btnTextSpan.length && spinnerSpan.length) {
-        btnTextSpan.hide();
-        spinnerSpan.show();
-      } else {
-        // Fallback si no hay span de texto/spinner: cambiar el texto del botón
-        submitButton.text("Enviando...");
-      }
+      submitButton.prop("disabled", true).text("Enviando...");
 
       $.ajax({
         url: CONFIG.urlCrearSolicitud,
@@ -158,30 +181,14 @@ function initVacationFormSubmission() {
         success: function (response) {
           showAlert(response.message, response.status);
           if (response.status === "success") {
-            window.location.reload(); // Recargar la página para actualizar el historial y días disponibles
-          }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          showAlert(
-            `Ocurrió un error al conectar con el servidor: ${textStatus} - ${errorThrown}. Inténtalo de nuevo.`,
-            "error"
-          );
-          console.error(
-            "AJAX Error:",
-            textStatus,
-            errorThrown,
-            jqXHR.responseText
-          );
-        },
-        complete: function () {
-          // Habilitar botón y ocultar spinner
-          submitButton.prop("disabled", false);
-          if (btnTextSpan.length && spinnerSpan.length) {
-            btnTextSpan.show();
-            spinnerSpan.hide();
+            window.location.reload();
           } else {
-            submitButton.html(originalButtonText); // Restaurar el HTML original
+            submitButton.prop("disabled", false).text("Solicitar");
           }
+        },
+        error: function () {
+          showAlert("Ocurrió un error al conectar con el servidor.", "error");
+          submitButton.prop("disabled", false).text("Solicitar");
         },
       });
     });
@@ -192,12 +199,8 @@ function initVacationFormSubmission() {
 // 4. Lógica para el Login (Spinner en botón de login)
 // ----------------------------------------------------
 
-/**
- * Inicializa la funcionalidad de spinner en el botón de login al enviar el formulario.
- */
 function initLoginSpinner() {
-  // Suponiendo que el formulario de login es '.login-form'
-  const loginForm = $(".login-form"); // Asegúrate de que esta clase sea correcta
+  const loginForm = $(".login-form");
 
   if (loginForm.length && DOM.loginButton.length) {
     loginForm.on("submit", function () {
@@ -215,11 +218,7 @@ function initLoginSpinner() {
 $(document).ready(function () {
   initVacationDateCalculator();
   initVacationFormSubmission();
-  initLoginSpinner(); // Asegúrate de que esta función se llame solo si jQuery se carga antes del script del login
-
-  // Puedes añadir aquí otras funciones de inicialización
-  // Por ejemplo, para el dashboard del aprobador si todo el JS está en un solo archivo:
-  // initAprovalModalLogic();
+  initLoginSpinner();
 });
 
 // })(jQuery); // Cierre de la encapsulación jQuery
