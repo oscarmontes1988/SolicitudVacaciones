@@ -39,7 +39,7 @@ $is_disabled = $total_dias_disponibles <= 0;
                 </div>
             </div> <?php if (!$is_disabled) : ?>
                 <form id="form-solicitud-directa" class="hero-form-horizontal" data-festivos='<?php echo json_encode($festivos); ?>'>
-                    <input type="hidden" name="periodo_id" value="<?php echo htmlspecialchars((string)$periodo_mas_antiguo_id); ?>">
+                    <input type="hidden" name="periodo_causacion_id" value="<?php echo htmlspecialchars((string)$periodo_mas_antiguo_id); ?>">
                     <input type="hidden" id="fecha_fin_hidden" name="fecha_fin_disfrute">
 
                     <div class="form-group">
