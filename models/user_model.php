@@ -20,22 +20,31 @@
  */
 function getUserByUsername($conn, $username)
 {
-    // PREVENCIÓN DE INYECCIÓN SQL: La regla de oro. Nunca confíes en los datos del usuario.
-    // Usamos sentencias preparadas (prepared statements).
-    $sql = "SELECT * FROM users WHERE username = ?"; // 1. Usamos un marcador de posición (?) en lugar de concatenar la variable.
-
-    $stmt = $conn->prepare($sql); // 2. Preparamos la consulta. El motor de la BD la analiza y compila.
-
-    // 3. Vinculamos el valor de la variable $username al marcador de posición.
-    // "s" significa que el tipo de dato es un string. Esto neutraliza cualquier código malicioso.
+    $sql = "SELECT id, username, password, email, nombre_completo, cedula, cargo, dependencia, rol, tipo_funcionario FROM users WHERE username = ?";
+    $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        return null;
+    }
     $stmt->bind_param("s", $username);
-
-    $stmt->execute(); // 4. Ejecutamos la consulta de forma segura.
-
-    $result = $stmt->get_result(); // Obtenemos el conjunto de resultados.
-
-    // fetch_assoc() nos da una fila como un array asociativo (['clave' => 'valor']), que es muy cómodo para usar.
-    return $result->fetch_assoc();
+    $stmt->execute();
+    $id = null;
+    $uname = null;
+    $pass = null;
+    $email = null;
+    $nombre = null;
+    $cedula = null;
+    $cargo = null;
+    $dep = null;
+    $rol = null;
+    $tipo = null;
+    $stmt->bind_result($id, $uname, $pass, $email, $nombre, $cedula, $cargo, $dep, $rol, $tipo);
+    if ($stmt->fetch()) {
+        $user_data = array('id' => $id, 'username' => $uname, 'password' => $pass, 'email' => $email, 'nombre_completo' => $nombre, 'cedula' => $cedula, 'cargo' => $cargo, 'dependencia' => $dep, 'rol' => $rol, 'tipo_funcionario' => $tipo);
+        $stmt->close();
+        return $user_data;
+    }
+    $stmt->close();
+    return null;
 }
 
 /**
@@ -43,16 +52,23 @@ function getUserByUsername($conn, $username)
  */
 function getPeriodosCausacion($conn, $userId)
 {
-    // De nuevo, sentencia preparada para seguridad, aunque aquí el $userId viene de la sesión
-    // y es teóricamente seguro. La buena práctica es ser consistente.
-    $sql = "SELECT id, fecha_inicio, fecha_fin FROM periodos_causacion WHERE user_id = ? AND disponible = 1";
+    $sql = "SELECT id, fecha_inicio, fecha_fin FROM periodos_causacion WHERE user_id = ? AND disponible = 1 ORDER BY fecha_inicio ASC";
     $stmt = $conn->prepare($sql);
-    // "i" significa que el tipo de dato es un integer (entero).
+    if ($stmt === false) {
+        return array();
+    }
     $stmt->bind_param("i", $userId);
     $stmt->execute();
-    $result = $stmt->get_result();
-    // fetch_all(MYSQLI_ASSOC) es perfecto cuando esperamos múltiples filas. Nos devuelve un array de arrays.
-    return $result->fetch_all(MYSQLI_ASSOC);
+    $id = null;
+    $fecha_inicio = null;
+    $fecha_fin = null;
+    $stmt->bind_result($id, $fecha_inicio, $fecha_fin);
+    $periodos = array();
+    while ($stmt->fetch()) {
+        $periodos[] = array('id' => $id, 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin);
+    }
+    $stmt->close();
+    return $periodos;
 }
 
 /**

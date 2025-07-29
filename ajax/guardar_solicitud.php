@@ -59,7 +59,7 @@ try {
     $stmtSolicitud->close();
 
     // 5. Inserción en 'solicitudes_historial' usando la función del modelo
-    if (!registrarAccionHistorial($conn, $nuevaSolicitudId, $userId, 'Creada', $estadoInicial)) {
+    if (!registrarAccionEnHistorial($conn, $nuevaSolicitudId, $userId, 'Creada', $estadoInicial)) {
         throw new Exception("Error al registrar la acción en el historial.");
     }
 

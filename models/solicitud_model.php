@@ -1,247 +1,221 @@
 <?php
 
+// =========================================================================
+// INICIO: Archivo /models/solicitud_model.php (Versión Auditada)
+// =========================================================================
+
 /**
  * Archivo: models/solicitud_model.php
- * Rol: Modelo para la entidad 'SolicitudVacaciones'. Contiene toda la lógica de negocio
- * y las operaciones de base de datos relacionadas con las solicitudes.
+ * Rol: Modelo para la entidad 'SolicitudVacaciones'.
+ * VERSIÓN AUDITADA Y 100% COMPATIBLE CON PHP 5.6
  */
 
 /**
- * Calcula la fecha de Pascua para un año determinado usando un algoritmo universal.
- * Es más robusto que la función nativa de PHP `easter_date()`.
+ * Función auxiliar para mover una fecha al siguiente lunes.
+ * Se convierte a una función estándar para máxima compatibilidad.
  */
-function calculateEasterDate($year)
+function moverAlLunesSiguiente(DateTime $fecha)
 {
-    $a = $year % 19;
-    $b = floor($year / 100);
-    $c = $year % 100;
-    $d = floor($b / 4);
-    $e = $b % 4;
-    $f = floor(($b + 8) / 25);
-    $g = floor(($b - $f + 1) / 3);
-    $h = (19 * $a + $b - $d - $g + 15) % 30;
-    $i = floor($c / 4);
-    $k = $c % 4;
-    $l = (32 + 2 * $e + 2 * $i - $h - $k) % 7;
-    $m = floor(($a + 11 * $h + 22 * $l) / 451);
-
-    $month = floor(($h + $l - 7 * $m + 114) / 31);
-    $day = (($h + $l - 7 * $m + 114) % 31) + 1;
-
-    // Crea un objeto DateTime para poder manipular la fecha fácilmente
-    $easterDate = new DateTime();
-    $easterDate->setDate($year, $month, $day);
-    return $easterDate;
+    if ($fecha->format('N') != 1) {
+        $fecha->modify('next monday');
+    }
+    return $fecha->format('Y-m-d');
 }
 
 /**
- * Obtiene los días festivos de Colombia para un año específico, ajustados por la Ley Emiliani.
+ * Calcula los festivos de Colombia para un año específico según la Ley Emiliani.
  */
 function getFestivosLeyEmiliani($year)
 {
-    // 1. Festivos fijos
-    $festivosFijos = [
-        '01-01', // Año Nuevo
-        '05-01', // Día del Trabajo
-        '07-20', // Día de la Independencia
-        '08-07', // Batalla de Boyacá
-        '12-08', // Inmaculada Concepción
-        '12-25', // Navidad
-    ];
+    // Cálculo de la fecha de Pascua usando el algoritmo de Gauss.
+    $a = $year % 19;
+    $b = $year % 4;
+    $c = $year % 7;
+    $k = floor($year / 100);
+    $p = floor((13 + 8 * $k) / 25);
+    $q = floor($k / 4);
+    $M = (15 - $p + $k - $q) % 30;
+    $N = (4 + $k - $q) % 7;
+    $d = (19 * $a + $M) % 30;
+    $e = (2 * $b + 4 * $c + 6 * $d + $N) % 7;
 
-    // 2. Festivos que se mueven al siguiente lunes (Ley Emiliani)
-    $festivosMovibles = [
-        '01-06', // Reyes Magos
-        '03-19', // San José
-        '06-29', // San Pedro y San Pablo
-        '08-15', // Asunción de la Virgen
-        '10-12', // Día de la Raza
-        '11-01', // Todos los Santos
-        '11-11', // Independencia de Cartagena
-    ];
-
-    // 3. Festivos basados en la Pascua
-    $easterDate = calculateEasterDate($year);
-    $festivosPascua = [];
-
-    // Jueves Santo: 3 días antes de Pascua
-    $juevesSanto = clone $easterDate;
-    $juevesSanto->modify('-3 days');
-    $festivosPascua[] = $juevesSanto->format('m-d');
-
-    // Viernes Santo: 2 días antes de Pascua
-    $viernesSanto = clone $easterDate;
-    $viernesSanto->modify('-2 days');
-    $festivosPascua[] = $viernesSanto->format('m-d');
-
-    // Ascensión del Señor: 43 días después de Pascua (se mueve a lunes)
-    $ascension = clone $easterDate;
-    $ascension->modify('+43 days');
-    $festivosMovibles[] = $ascension->format('m-d');
-
-    // Corpus Christi: 64 días después de Pascua (se mueve a lunes)
-    $corpus = clone $easterDate;
-    $corpus->modify('+64 days');
-    $festivosMovibles[] = $corpus->format('m-d');
-
-    // Sagrado Corazón: 71 días después de Pascua (se mueve a lunes)
-    $sagradoCorazon = clone $easterDate;
-    $sagradoCorazon->modify('+71 days');
-    $festivosMovibles[] = $sagradoCorazon->format('m-d');
-
-
-    // Unimos los festivos fijos y los de pascua
-    $festivos = array_merge($festivosFijos, $festivosPascua);
-
-    // Procesamos los festivos movibles
-    foreach ($festivosMovibles as $fechaMD) {
-        $fechaCompleta = new DateTime("$year-$fechaMD");
-        // Si el día no es lunes (1), lo movemos al siguiente lunes
-        if ($fechaCompleta->format('N') != 1) {
-            $fechaCompleta->modify('next monday');
-        }
-        $festivos[] = $fechaCompleta->format('m-d');
+    $diaPascua = 22 + $d + $e;
+    $mesPascua = 3;
+    if ($diaPascua > 31) {
+        $diaPascua = $diaPascua - 31;
+        $mesPascua = 4;
     }
+    $pascua = new DateTime($year . '-' . $mesPascua . '-' . $diaPascua);
 
-    // Devolvemos las fechas en formato 'YYYY-MM-DD' para facilitar la comparación
-    $resultadoFinal = [];
-    foreach ($festivos as $fechaMD) {
-        $resultadoFinal[] = "$year-$fechaMD";
-    }
+    $festivos = array(
+        $year . '-01-01',
+        $year . '-05-01',
+        $year . '-07-20',
+        $year . '-08-07',
+        $year . '-12-08',
+        $year . '-12-25',
+    );
 
-    return $resultadoFinal;
+    // Festivos móviles basados en fechas fijas (Ley Emiliani)
+    $festivos[] = moverAlLunesSiguiente(new DateTime($year . '-01-06'));
+    $festivos[] = moverAlLunesSiguiente(new DateTime($year . '-03-19'));
+    $festivos[] = moverAlLunesSiguiente(new DateTime($year . '-06-29'));
+    $festivos[] = moverAlLunesSiguiente(new DateTime($year . '-08-15'));
+    $festivos[] = moverAlLunesSiguiente(new DateTime($year . '-10-12'));
+    $festivos[] = moverAlLunesSiguiente(new DateTime($year . '-11-01'));
+    $festivos[] = moverAlLunesSiguiente(new DateTime($year . '-11-11'));
+
+    // Festivos móviles basados en Pascua
+    $pascuaClon1 = clone $pascua;
+    $festivos[] = $pascuaClon1->modify('-3 days')->format('Y-m-d');
+    $pascuaClon2 = clone $pascua;
+    $festivos[] = $pascuaClon2->modify('-2 days')->format('Y-m-d');
+    $pascuaClon3 = clone $pascua;
+    $festivos[] = moverAlLunesSiguiente($pascuaClon3->modify('+40 days'));
+    $pascuaClon4 = clone $pascua;
+    $festivos[] = moverAlLunesSiguiente($pascuaClon4->modify('+61 days'));
+    $pascuaClon5 = clone $pascua;
+    $festivos[] = moverAlLunesSiguiente($pascuaClon5->modify('+68 days'));
+
+    return $festivos;
 }
 
-
-/**
- * Calcula los días hábiles entre dos fechas, excluyendo fines de semana y festivos.
- */
-function calcularDiasHabiles($fechaInicio, $fechaFin, $festivos = [])
+function calcularDiasHabiles($fechaInicio, $fechaFin)
 {
     $inicio = new DateTime($fechaInicio);
     $fin = new DateTime($fechaFin);
     $fin->modify('+1 day');
-
     $intervalo = new DateInterval('P1D');
-    $periodo = new DatePeriod($inicio, $intervalo, $fin);
-
+    $periodoFechas = new DatePeriod($inicio, $intervalo, $fin);
+    $year = $inicio->format('Y');
+    $festivos = getFestivosLeyEmiliani($year);
+    if ($inicio->format('Y') != $fin->format('Y')) {
+        $festivos = array_merge($festivos, getFestivosLeyEmiliani($fin->format('Y')));
+    }
     $diasHabiles = 0;
-    foreach ($periodo as $dia) {
-        $diaDeLaSemana = $dia->format('N'); // 1 (Lunes) a 7 (Domingo)
-        $fechaActualStr = $dia->format('Y-m-d');
-
-        // No cuenta si es Sábado (6), Domingo (7) o un día festivo
-        if ($diaDeLaSemana < 6 && !in_array($fechaActualStr, $festivos)) {
+    foreach ($periodoFechas as $fecha) {
+        if ($fecha->format('N') < 6 && !in_array($fecha->format('Y-m-d'), $festivos)) {
             $diasHabiles++;
         }
     }
     return $diasHabiles;
 }
 
-/**
- * Obtiene el saldo de vacaciones real de un usuario.
- */
 function getSaldoVacaciones($conn, $userId, $diasPorPeriodo = 15)
 {
-    // 1. Obtener periodos disponibles
     $periodos = getPeriodosCausacion($conn, $userId);
     $diasGanados = count($periodos) * $diasPorPeriodo;
-
-    // 2. Obtener festivos para los próximos años para un cálculo preciso
-    $currentYear = (int)date('Y');
-    $festivos = [];
-    for ($i = 0; $i < 30; $i++) {
-        $festivos = array_merge($festivos, getFestivosLeyEmiliani($currentYear + $i));
-    }
-
-    // 3. Obtener días usados o en proceso
     $sql = "SELECT fecha_inicio_disfrute, fecha_fin_disfrute FROM solicitudes_vacaciones 
-            WHERE user_id = ? AND estado <> 'Rechazada'";
+            WHERE user_id = ? AND (estado = 'Vacaciones Autorizadas' OR estado LIKE 'Esperando%')";
     $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        return 0;
+    }
     $stmt->bind_param("i", $userId);
     $stmt->execute();
-    $solicitudes = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-
+    $fecha_inicio_disfrute = null;
+    $fecha_fin_disfrute = null;
+    $stmt->bind_result($fecha_inicio_disfrute, $fecha_fin_disfrute);
     $diasUsados = 0;
-    foreach ($solicitudes as $solicitud) {
-        $diasUsados += calcularDiasHabiles($solicitud['fecha_inicio_disfrute'], $solicitud['fecha_fin_disfrute'], $festivos);
+    while ($stmt->fetch()) {
+        $diasUsados += calcularDiasHabiles($fecha_inicio_disfrute, $fecha_fin_disfrute);
     }
-
-    // 4. Calcular saldo
+    $stmt->close();
     return $diasGanados - $diasUsados;
 }
 
-/**
- * Obtiene las solicitudes de un usuario con información del periodo de causación.
- */
 function getSolicitudesByUser($conn, $userId)
 {
-    $sql = "SELECT s.*, p.fecha_inicio AS periodo_inicio, p.fecha_fin AS periodo_fin 
+    $sql = "SELECT s.id, s.user_id, s.periodo_causacion_id, s.fecha_inicio_disfrute, s.fecha_fin_disfrute, s.fecha_solicitud, s.estado, p.fecha_inicio AS periodo_inicio, p.fecha_fin AS periodo_fin 
             FROM solicitudes_vacaciones s
             JOIN periodos_causacion p ON s.periodo_causacion_id = p.id
             WHERE s.user_id = ? ORDER BY s.fecha_solicitud DESC";
     $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        return array();
+    }
     $stmt->bind_param("i", $userId);
     $stmt->execute();
-    $result = $stmt->get_result();
-    return $result->fetch_all(MYSQLI_ASSOC);
+    $id = null;
+    $user_id = null;
+    $periodo_causacion_id = null;
+    $fecha_inicio_disfrute = null;
+    $fecha_fin_disfrute = null;
+    $fecha_solicitud = null;
+    $estado = null;
+    $periodo_inicio = null;
+    $periodo_fin = null;
+    $stmt->bind_result($id, $user_id, $periodo_causacion_id, $fecha_inicio_disfrute, $fecha_fin_disfrute, $fecha_solicitud, $estado, $periodo_inicio, $periodo_fin);
+    $solicitudes = array();
+    while ($stmt->fetch()) {
+        $solicitudes[] = array('id' => $id, 'user_id' => $user_id, 'periodo_causacion_id' => $periodo_causacion_id, 'fecha_inicio_disfrute' => $fecha_inicio_disfrute, 'fecha_fin_disfrute' => $fecha_fin_disfrute, 'fecha_solicitud' => $fecha_solicitud, 'estado' => $estado, 'periodo_inicio' => $periodo_inicio, 'periodo_fin' => $periodo_fin);
+    }
+    $stmt->close();
+    return $solicitudes;
 }
 
-/**
- * Obtiene las solicitudes pendientes para un rol de aprobador específico.
- */
 function getSolicitudesPendientesParaAprobador($conn, $rolAprobador)
 {
-    $sql = "SELECT s.*, u.nombre_completo, u.cedula, u.dependencia
+    $sql = "SELECT s.id, s.fecha_inicio_disfrute, s.fecha_fin_disfrute, s.fecha_solicitud, u.nombre_completo, u.cedula, u.dependencia
             FROM solicitudes_vacaciones s
             JOIN users u ON s.user_id = u.id
             WHERE s.aprobador_actual = ? AND s.estado LIKE 'Esperando Aprobación%'
             ORDER BY s.fecha_solicitud ASC";
     $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        return array();
+    }
     $stmt->bind_param("s", $rolAprobador);
     $stmt->execute();
-    $result = $stmt->get_result();
-    return $result->fetch_all(MYSQLI_ASSOC);
+    $id = null;
+    $fecha_inicio_disfrute = null;
+    $fecha_fin_disfrute = null;
+    $fecha_solicitud = null;
+    $nombre_completo = null;
+    $cedula = null;
+    $dependencia = null;
+    $stmt->bind_result($id, $fecha_inicio_disfrute, $fecha_fin_disfrute, $fecha_solicitud, $nombre_completo, $cedula, $dependencia);
+    $solicitudes = array();
+    while ($stmt->fetch()) {
+        $solicitudes[] = array('id' => $id, 'fecha_inicio_disfrute' => $fecha_inicio_disfrute, 'fecha_fin_disfrute' => $fecha_fin_disfrute, 'fecha_solicitud' => $fecha_solicitud, 'nombre_completo' => $nombre_completo, 'cedula' => $cedula, 'dependencia' => $dependencia);
+    }
+    $stmt->close();
+    return $solicitudes;
 }
 
-/**
- * Define la "máquina de estados" del flujo de aprobación.
- */
 function getSiguienteAprobador($tipoFuncionario, $estadoActual = null)
 {
-    $flujos = [
-        'Nivel Central' => ['Coordinador', 'Jefe de Área'],
-        'ORIP Seccional' => ['Registrador', 'Director Regional'],
-        'ORIP Principal' => ['Coordinador', 'Registrador', 'Director Regional'],
-        'Registrador' => ['Director Regional', 'Director Técnico de Registro']
-    ];
-    $flujoActual = isset($flujos[$tipoFuncionario]) ? $flujos[$tipoFuncionario] : [];
-
+    $flujos = array(
+        'Nivel Central' => array('Coordinador', 'Jefe de Área'),
+        'ORIP Seccional' => array('Registrador', 'Director Regional'),
+        'ORIP Principal' => array('Coordinador', 'Registrador', 'Director Regional'),
+        'Registrador' => array('Director Regional', 'Director Técnico de Registro')
+    );
+    $flujoActual = isset($flujos[$tipoFuncionario]) ? $flujos[$tipoFuncionario] : array();
     if ($estadoActual === null) {
         return isset($flujoActual[0]) ? $flujoActual[0] : null;
     }
-
     $estadoSinPrefijo = str_replace('Esperando Aprobación ', '', $estadoActual);
     $indiceActual = array_search($estadoSinPrefijo, $flujoActual);
-
     if ($indiceActual !== false && isset($flujoActual[$indiceActual + 1])) {
         return $flujoActual[$indiceActual + 1];
     }
-
     return null;
 }
 
-/**
- * Inserta un nuevo registro en el historial de una solicitud.
- */
-function registrarAccionHistorial($conn, $solicitudId, $usuarioAccionId, $accion, $estadoResultante, $justificacion = '')
+function registrarAccionEnHistorial($conn, $solicitudId, $usuarioAccionId, $accion, $estadoResultante, $justificacion = null)
 {
-    $sql = "INSERT INTO solicitudes_historial (solicitud_id, usuario_accion_id, accion, estado_resultante, justificacion) 
-            VALUES (?, ?, ?, ?, ?)";
-
+    $sql = "INSERT INTO solicitudes_historial (solicitud_id, usuario_accion_id, accion, estado_resultante, justificacion, fecha_accion) VALUES (?, ?, ?, ?, ?, NOW())";
     $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        error_log("Error al preparar la consulta de historial: " . $conn->error);
+        return false;
+    }
     $stmt->bind_param("iisss", $solicitudId, $usuarioAccionId, $accion, $estadoResultante, $justificacion);
-
-    return $stmt->execute();
+    $exito = $stmt->execute();
+    if ($exito === false) {
+        error_log("Error al ejecutar la inserción en historial: " . $stmt->error);
+    }
+    $stmt->close();
+    return $exito;
 }

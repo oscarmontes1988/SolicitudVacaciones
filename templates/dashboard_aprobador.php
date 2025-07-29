@@ -126,33 +126,40 @@
             const formData = new FormData(formDecision);
             // Puedes añadir aquí un spinner o mensaje de carga
 
-            fetch('process_approval.php', { // Reemplaza con la URL real de tu script de procesamiento
+            fetch('ajax/procesar_aprobacion.php', {
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Actualiza el estado en la tabla (ej. elimina la fila o cambia el estado visualmente)
-                        const rowToRemove = document.querySelector(`tr[data-id="${modalSolicitudId.value}"]`);
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    // === ESTA ES LA LÍNEA CORREGIDA ===
+                    if (data.status === 'success') {
+                        alert(data.message);
+                        var rowToRemove = document.querySelector('tr[data-id="' + modalSolicitudId.value + '"]');
                         if (rowToRemove) {
                             rowToRemove.remove();
                         }
-                        // Muestra un mensaje de éxito al usuario (opcional)
-                        alert('Solicitud procesada con éxito!');
-                        decisionModal.style.display = 'none'; // Cierra el modal
-                        // Si no quedan solicitudes, actualiza el mensaje de la tabla
-                        if (document.querySelectorAll('#pendientes-table tbody tr').length === 0) {
-                            document.querySelector('#pendientes-table tbody').innerHTML = '<tr><td colspan="6" class="table-empty-message">No hay solicitudes pendientes de aprobación.</td></tr>';
+                        // === ESTE BLOQUE HA SIDO CORREGIDO ===
+                        // Después de eliminar la fila, volvemos a seleccionar el cuerpo de la tabla
+                        // para asegurarnos de que todavía existe antes de intentar modificarlo.
+                        var pendientesTableBody = document.getElementById('pendientes-table-body');
+                        if (pendientesTableBody && pendientesTableBody.children.length === 0) {
+                            pendientesTableBody.innerHTML = '<tr><td colspan="6" class="table-empty-message">No hay solicitudes pendientes de aprobación.</td></tr>';
                         }
+                        // === ESTE BLOQUE HA SIDO CORREGIDO ===
+                        // En lugar de llamar a una función que podría estar fuera de alcance,
+                        // ejecutamos la acción directamente.
+                        document.getElementById('decision-modal').style.display = 'none';
 
                     } else {
-                        alert('Error al procesar la solicitud: ' + data.message);
+                        alert('Error: ' + (data.message || 'No se pudo procesar la solicitud.'));
                     }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Ocurrió un error de red o del servidor.');
+                .catch(function(error) {
+                    console.error('Error en fetch:', error);
+                    alert('Ocurrió un error de red o del servidor. Revisa la consola para más detalles.');
                 });
         });
     });
