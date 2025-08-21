@@ -11,11 +11,17 @@ const DOM = {
   // Selectores para el dashboard del solicitante que se actualizan dinámicamente
   diasDisponiblesContainer: $(".hero-days"),
   historialTableBody: $(".dashboard-main tbody"),
+  // MEJORA: Selectores para el modal de detalle
+  detalleModal: $("#detalle-solicitud-modal"),
+  detalleModalContent: $("#detalle-solicitud-contenido"),
+  historialContainer: $(".dashboard-main"), // Contenedor de la tabla de historial
 };
 
 const CONFIG = {
   diasPorDefecto: 15, // Días de vacaciones que se toman
   urlCrearSolicitud: "ajax/guardar_solicitud.php",
+  // MEJORA: URL para obtener detalle de solicitud
+  urlGetDetalle: "ajax/get_solicitud_detalle.php",
 };
 
 // --- 2. Funciones Utilitarias (Helpers) ---
@@ -163,7 +169,28 @@ function initVacationFormSubmission() {
             ) {
               DOM.historialTableBody.empty();
             }
-            DOM.historialTableBody.prepend(response.newRowHtml);
+
+            // REFACTORIZACIÓN: Construir el HTML de la nueva fila dinámicamente
+            const data = response.newRequestData;
+            const newRow = `
+              <tr data-id="${data.id}">
+                <td>${data.fechaDisfrute}</td>
+                <td>${data.fechaCausacion}</td>
+                <td>${data.fechaSolicitud}</td>
+                <td>
+                  <span class="status-badge status-${data.estadoClass}">
+                    ${data.estado}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-secondary btn-sm btn-ver-detalle" data-solicitud-id="${data.id}">
+                    <i class="fas fa-eye"></i> Ver
+                  </button>
+                </td>
+              </tr>
+            `;
+
+            DOM.historialTableBody.prepend(newRow);
             DOM.formSolicitudDirecta[0].reset();
             DOM.fechaFinDisplay.text("--/--/----");
             DOM.fechaFinHidden.val("");
@@ -191,8 +218,97 @@ function initVacationFormSubmission() {
   }
 }
 
-// --- 4. Inicialización Global ---
+// --- 4. Lógica para el Modal de Detalles (CORRECCIÓN) ---
+
+/**
+ * Inicializa la lógica para mostrar el modal con los detalles de la solicitud.
+ */
+function initVerDetalleModal() {
+  if (!DOM.detalleModal.length) return;
+
+  // Usamos delegación de eventos para que funcione con las filas añadidas dinámicamente
+  DOM.historialContainer.on("click", ".btn-ver-detalle", function () {
+    const solicitudId = $(this).data("solicitud-id");
+
+    // 1. Mostrar modal y estado de carga
+    DOM.detalleModal.css("display", "flex");
+    DOM.detalleModalContent.html(
+      '<div class="spinner-container"><div class="spinner"></div><p>Cargando detalles...</p></div>'
+    );
+
+    // 2. Hacer la llamada AJAX para obtener los detalles
+    $.ajax({
+      url: `${CONFIG.urlGetDetalle}?id=${solicitudId}`,
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.status === "success") {
+          const solicitud = response.data;
+          // 3. Construir el HTML con los datos recibidos
+          let historialHtml = "";
+          if (solicitud.historial && solicitud.historial.length > 0) {
+            solicitud.historial.forEach((evento) => {
+              historialHtml += `
+                <div class="historial-item">
+                  <div class="historial-fecha">${evento.fecha_accion_fmt}</div>
+                  <div class="historial-info">
+                    <span class="historial-actor">${evento.nombre_completo_fmt}</span>
+                    realizó la acción: <span class="historial-accion">${evento.accion_fmt}</span>.
+                    <div class="historial-estado">Estado resultante: <strong>${evento.estado_resultante_fmt}</strong></div>
+                    <div class="historial-justificacion">Justificación: <em>${evento.justificacion}</em></div>
+                  </div>
+                </div>`;
+            });
+          } else {
+            historialHtml = "<p>No hay un historial de acciones para esta solicitud.</p>";
+          }
+
+          const contentHtml = `
+            <div class="detalle-grid">
+              <div><strong>Fecha de Solicitud:</strong> ${solicitud.fecha_solicitud_fmt}</div>
+              <div><strong>Estado Actual:</strong> <span class="status-badge status-${solicitud.estado.toLowerCase().replace(/ /g, '-')}">${solicitud.estado}</span></div>
+              <div><strong>Periodo de Disfrute:</strong> ${solicitud.periodo_disfrute_fmt}</div>
+              <div><strong>Periodo de Causación:</strong> ${solicitud.periodo_causacion_fmt}</div>
+            </div>
+            <hr>
+            <h4>Historial de la Solicitud</h4>
+            <div class="historial-timeline">
+              ${historialHtml}
+            </div>
+          `;
+          DOM.detalleModalContent.html(contentHtml);
+        } else {
+          DOM.detalleModalContent.html(
+            `<p class="alert alert-danger">Error: ${response.message}</p>`
+          );
+        }
+      },
+      error: function () {
+        DOM.detalleModalContent.html(
+          '<p class="alert alert-danger">No se pudo conectar con el servidor para obtener los detalles.</p>'
+        );
+      },
+    });
+  });
+
+  // Lógica para cerrar el modal
+  function closeModal() {
+    DOM.detalleModal.hide();
+  }
+
+  DOM.detalleModal.on("click", ".close-modal, .btn-cancel-modal", closeModal);
+
+  $(window).on("click", function (event) {
+    if ($(event.target).is(DOM.detalleModal)) {
+      closeModal();
+    }
+  });
+}
+
+
+// --- 5. Inicialización Global ---
 $(document).ready(function () {
   initVacationDateCalculator();
   initVacationFormSubmission();
+  initVerDetalleModal(); // Añadimos la inicialización del nuevo modal
 });

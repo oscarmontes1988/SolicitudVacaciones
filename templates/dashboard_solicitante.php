@@ -94,7 +94,7 @@ $is_disabled = $total_dias_disponibles <= 0;
                                     </span>
                                 </td>
                                 <td>
-                                    <button class="btn btn-secondary btn-sm" onclick="verDetalle(<?php echo $solicitud['id']; ?>)">
+                                    <button class="btn btn-secondary btn-sm btn-ver-detalle" data-solicitud-id="<?php echo $solicitud['id']; ?>">
                                         <i class="fas fa-eye"></i> Ver
                                     </button>
                                 </td>
@@ -126,4 +126,22 @@ $is_disabled = $total_dias_disponibles <= 0;
             </div>
         </aside>
     </div>
-</div> ```
+</div>
+
+<!-- Modal para ver detalles de la solicitud -->
+<div id="detalle-solicitud-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h3 class="modal-title">Detalles de la Solicitud</h3>
+        <div id="detalle-solicitud-contenido" class="modal-body">
+            <!-- El contenido se cargará aquí con AJAX -->
+            <div class="spinner-container">
+                <div class="spinner"></div>
+                <p>Cargando detalles...</p>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary btn-cancel-modal">Cerrar</button>
+        </div>
+    </div>
+</div>

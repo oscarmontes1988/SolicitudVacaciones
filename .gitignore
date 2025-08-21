@@ -1,0 +1,5 @@
+# Ignorar el archivo de variables de entorno. Contiene información sensible.
+.env
+
+# Ignorar la carpeta de dependencias de Composer. Se instala con `composer install`.
+/vendor/

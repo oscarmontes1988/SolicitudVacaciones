@@ -20,14 +20,20 @@
 
 // --- SECCIÓN DE CONFIGURACIÓN DE CREDENCIALES ---
 
-// Usamos constantes (define) en lugar de variables para las credenciales.
-// Justificación Técnica: Las constantes tienen un ámbito global y son inmutables.
-// Esto previene que sus valores puedan ser sobrescritos accidentalmente en otra parte
-// del código, añadiendo una capa de previsibilidad y seguridad.
-define('DB_HOST', '192.168.80.175');
-define('DB_USER', 'root'); // ADVERTENCIA: El uso del usuario 'root' en producción es una vulnerabilidad de seguridad crítica. Se debe crear un usuario específico para la aplicación con los permisos mínimos necesarios (Principio de Mínimo Privilegio).
-define('DB_PASS', 'M01ses8o8o'); // La contraseña se maneja aquí. En sistemas más avanzados, esto se cargaría desde variables de entorno (.env) para no versionar credenciales en el repositorio de código.
-define('DB_NAME', 'empresa_vacaciones');
+// MEJORA DE SEGURIDAD: Cargar variables de entorno desde el archivo .env
+// Esto evita tener credenciales directamente en el código.
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Usamos la sintaxis para la versión 2.x de la librería, compatible con PHP 5.6
+$dotenv = new Dotenv\Dotenv(__DIR__ . '/../');
+$dotenv->load();
+
+// Leemos las credenciales desde las variables de entorno cargadas.
+// El uso de getenv() es la forma estándar de acceder a estas variables.
+$db_host = getenv('DB_HOST');
+$db_user = getenv('DB_USER');
+$db_pass = getenv('DB_PASS');
+$db_name = getenv('DB_NAME');
 
 // --- SECCIÓN DE ESTABLECIMIENTO DE CONEXIÓN ROBUSTA ---
 // Este bloque de código implementa una conexión en varios pasos, ideal para depurar
@@ -35,7 +41,7 @@ define('DB_NAME', 'empresa_vacaciones');
 
 // Creamos una nueva instancia del objeto mysqli, que es la forma moderna (en la era de PHP 5.6)
 // de interactuar con una base de datos MySQL. Es la sucesora de la antigua extensión `mysql_`.
-$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+$conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 
 // La primera y más importante comprobación después de intentar una conexión.
 // Si `connect_error` tiene un valor, significa que la conexión falló.

@@ -80,28 +80,22 @@ try {
     $nuevaSolicitudData = $stmtNuevaFila->get_result()->fetch_assoc();
     $stmtNuevaFila->close();
 
-    // Formateamos las fechas y datos para que coincidan con el HTML del dashboard
-    $fechaDisfrute = date("d/m/Y", strtotime($nuevaSolicitudData['fecha_inicio_disfrute'])) . " - " . date("d/m/Y", strtotime($nuevaSolicitudData['fecha_fin_disfrute']));
-    $fechaCausacion = date("d/m/Y", strtotime($nuevaSolicitudData['periodo_inicio'])) . " - " . date("d/m/Y", strtotime($nuevaSolicitudData['periodo_fin']));
-    $fechaSolicitud = date("d/m/Y H:i", strtotime($nuevaSolicitudData['fecha_solicitud']));
-    $estadoClass = str_replace([' '], ['-'], strtolower(htmlspecialchars($nuevaSolicitudData['estado'])));
+    // REFACTORIZACIÓN: En lugar de generar HTML, ahora solo preparamos los datos.
+    $datosFila = array(
+        'id' => $nuevaSolicitudId,
+        'fechaDisfrute' => date("d/m/Y", strtotime($nuevaSolicitudData['fecha_inicio_disfrute'])) . " - " . date("d/m/Y", strtotime($nuevaSolicitudData['fecha_fin_disfrute'])),
+        'fechaCausacion' => date("d/m/Y", strtotime($nuevaSolicitudData['periodo_inicio'])) . " - " . date("d/m/Y", strtotime($nuevaSolicitudData['periodo_fin'])),
+        'fechaSolicitud' => date("d/m/Y H:i", strtotime($nuevaSolicitudData['fecha_solicitud'])),
+        'estado' => htmlspecialchars($nuevaSolicitudData['estado']),
+        'estadoClass' => str_replace(' ', '-', strtolower(htmlspecialchars($nuevaSolicitudData['estado'])))
+    );
 
-
-    // Creamos el HTML de la nueva fila que el JavaScript insertará en la tabla del historial
-    $newRowHtml = "<tr data-id='{$nuevaSolicitudId}'>" .
-        "<td>{$fechaDisfrute}</td>" .
-        "<td>{$fechaCausacion}</td>" .
-        "<td>{$fechaSolicitud}</td>" .
-        "<td><span class='status-badge status-{$estadoClass}'>" . htmlspecialchars($nuevaSolicitudData['estado']) . "</span></td>" .
-        "<td><button class='btn btn-secondary btn-sm' onclick='verDetalle({$nuevaSolicitudId})'><i class='fas fa-eye'></i> Ver</button></td>" .
-        "</tr>";
-
-    echo json_encode([
+    echo json_encode(array(
         'status' => 'success',
         'message' => 'Solicitud enviada correctamente.',
-        'newRowHtml' => $newRowHtml,
+        'newRequestData' => $datosFila,
         'diasDisponibles' => $saldoActualizado
-    ]);
+    ));
 } catch (Exception $e) {
     // Si algo falló en el 'try', revertimos todos los cambios para mantener la BD consistente
     $conn->rollback();

@@ -1005,3 +1005,10 @@ td.actions-column {
     padding: 10px 20px;
   }
 }
+
+/* --- REQUERIMIENTO: Centrar texto en tabla de historial --- */
+.dashboard-main table th,
+.dashboard-main table td {
+    text-align: center;
+    vertical-align: middle; /* Opcional: alinea verticalmente también */
+}

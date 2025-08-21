@@ -219,3 +219,55 @@ function registrarAccionEnHistorial($conn, $solicitudId, $usuarioAccionId, $acci
     $stmt->close();
     return $exito;
 }
+
+/**
+ * Obtiene los detalles completos de una solicitud específica, incluyendo su historial.
+ * Valida que la solicitud pertenezca al usuario que la consulta para seguridad.
+ */
+function getSolicitudById($conn, $solicitudId, $userId)
+{
+    // 1. Obtener los detalles principales de la solicitud
+    $sql = "SELECT s.id, s.fecha_inicio_disfrute, s.fecha_fin_disfrute, s.fecha_solicitud, s.estado, s.justificacion_aprobador, p.fecha_inicio AS periodo_inicio, p.fecha_fin AS periodo_fin
+            FROM solicitudes_vacaciones s
+            JOIN periodos_causacion p ON s.periodo_causacion_id = p.id
+            WHERE s.id = ? AND s.user_id = ?";
+
+    $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        return null;
+    }
+    $stmt->bind_param("ii", $solicitudId, $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $solicitud = $result->fetch_assoc();
+    $stmt->close();
+
+    if (!$solicitud) {
+        return null; // No se encontró la solicitud o no pertenece al usuario
+    }
+
+    // 2. Obtener el historial de la solicitud
+    $sql_historial = "SELECT h.fecha_accion, h.accion, h.estado_resultante, h.justificacion, u.nombre_completo
+                      FROM solicitudes_historial h
+                      JOIN users u ON h.usuario_accion_id = u.id
+                      WHERE h.solicitud_id = ?
+                      ORDER BY h.fecha_accion ASC";
+
+    $stmt_historial = $conn->prepare($sql_historial);
+    if ($stmt_historial === false) {
+        $solicitud['historial'] = array(); // Asegurarse de que historial sea un array
+        return $solicitud; // Devolver al menos los datos principales
+    }
+    $stmt_historial->bind_param("i", $solicitudId);
+    $stmt_historial->execute();
+    $result_historial = $stmt_historial->get_result();
+    $historial = array();
+    while ($fila = $result_historial->fetch_assoc()) {
+        $historial[] = $fila;
+    }
+    $stmt_historial->close();
+
+    $solicitud['historial'] = $historial;
+
+    return $solicitud;
+}
