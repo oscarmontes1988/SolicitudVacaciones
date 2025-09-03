@@ -292,9 +292,18 @@ body {
   border: 1px solid #e0f0ff;
 }
 
+.date-fields-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Tres columnas iguales */
+  gap: var(--spacing-sm);
+  /* flex: 1; Eliminado */
+  /* min-width: 300px; Eliminado */
+  align-items: stretch; /* Asegura que los elementos tengan la misma altura */
+}
+
 .form-group {
-  flex: 1; /* Permite que los grupos de formulario crezcan */
-  min-width: 150px; /* Ancho mínimo para cada campo */
+  /* flex: 1;  Eliminado, grid manejará el tamaño */
+  /* min-width: 150px; Eliminado, grid manejará el tamaño */
   display: flex;
   flex-direction: column;
 }
@@ -313,13 +322,14 @@ body {
   font-size: 1em;
   width: 100%; /* Asegura que el input o display ocupe el ancho completo de su grupo */
   box-sizing: border-box; /* Incluye padding y border en el width */
+  height: 40px; /* Asegura la misma altura para todos los campos de fecha */
 }
 
 .date-display {
   background-color: #e9ecef; /* Un color de fondo para indicar que es solo display */
   color: var(--color-text-dark);
   text-align: center;
-  min-height: 40px; /* Ajusta si es necesario para que sea igual al input */
+  /* min-height: 40px; Eliminado, ya se usa height */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -330,6 +340,13 @@ body {
   color: var(--color-text-light);
   margin-top: 5px;
   line-height: 1.3;
+}
+
+/* Media query para apilar en pantallas pequeñas */
+@media (max-width: 768px) {
+  .date-fields-container {
+    grid-template-columns: 1fr; /* Apila los campos en una sola columna en pantallas pequeñas */
+  }
 }
 
 /* --- Botones --- */
@@ -536,6 +553,15 @@ tr:hover {
   border-radius: var(--border-radius-base);
   color: var(--color-text-light);
   font-style: italic;
+}
+
+.period-card-unavailable {
+    opacity: 0.6;
+    background-color: #f0f0f0;
+}
+
+.period-card-unavailable .period-dates {
+    text-decoration: line-through;
 }
 
 /* --- Login Page Styles --- */

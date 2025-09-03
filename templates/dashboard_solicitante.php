@@ -42,22 +42,30 @@ $is_disabled = $total_dias_disponibles <= 0;
                     <input type="hidden" name="periodo_causacion_id" value="<?php echo htmlspecialchars((string)$periodo_mas_antiguo_id); ?>">
                     <input type="hidden" id="fecha_fin_hidden" name="fecha_fin_disfrute">
 
-                    <div class="form-group">
-                        <label for="fecha_inicio_disfrute" class="form-label">Fecha de Inicio</label>
-                        <input type="date" id="fecha_inicio_disfrute" name="fecha_inicio_disfrute" required class="form-input-date">
-                    </div>
+                    <div class="date-fields-container">
+                        <div class="form-group">
+                            <label for="fecha_inicio_disfrute" class="form-label">Fecha de Inicio</label>
+                            <input type="date" id="fecha_inicio_disfrute" name="fecha_inicio_disfrute" required class="form-input-date" min="<?php echo date('Y-m-d'); ?>">
+                        </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Fecha de Regreso</label>
-                        <span id="fecha-fin-display" class="date-display">--/--/----</span>
-                        <p class="form-help-text">Se calcula automáticamente al seleccionar la fecha de inicio.</p>
+                        <div class="form-group">
+                            <label class="form-label">Fecha de Fin</label>
+                            <input type="text" id="fecha-fin-vacaciones-display" class="date-display" disabled value="--/--/----">
+                            <p class="form-help-text">Último día de disfrute de las vacaciones.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Fecha de Regreso</label>
+                            <span id="fecha-fin-display" class="date-display">--/--/----</span>
+                            <p class="form-help-text">Se calcula automáticamente al seleccionar la fecha de inicio.</p>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-paper-plane"></i> Solicitar</button>
                 </form>
             <?php endif; ?>
         </div>
         <div class="hero-illustration">
-            <img src="https://res.cloudinary.com/dfed81ssz/image/upload/v1752156235/131126-OSS22X-121_yjid1h.jpg" alt="Ilustración de persona viajando">
+            <img src="https://res.cloudinary.com/dfed81ssz/image/upload/v1756484245/vacaciones_2_c69xuu.jpg" alt="Ilustración de persona viajando">
         </div>
     </section>
     <div class="container dashboard-layout">
@@ -94,9 +102,16 @@ $is_disabled = $total_dias_disponibles <= 0;
                                     </span>
                                 </td>
                                 <td>
-                                    <button class="btn btn-secondary btn-sm btn-ver-detalle" data-solicitud-id="<?php echo $solicitud['id']; ?>">
-                                        <i class="fas fa-eye"></i> Ver
-                                    </button>
+                                    <div style="display: flex; gap: 5px;">
+                                        <button class="btn btn-success btn-sm btn-ver-detalle" data-solicitud-id="<?php echo $solicitud['id']; ?>">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </button>
+                                        <?php if ($solicitud['estado'] === 'Esperando Aprobación Coordinador') : ?>
+                                            <button class="btn btn-danger btn-sm btn-eliminar-solicitud" data-solicitud-id="<?php echo $solicitud['id']; ?>">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -114,7 +129,7 @@ $is_disabled = $total_dias_disponibles <= 0;
                     </div>
                 <?php else : ?>
                     <?php foreach ($periodos as $periodo) : ?>
-                        <div class="period-card">
+                        <div class="period-card <?php echo ($periodo['disponible'] == 0) ? 'period-card-unavailable' : ''; ?>">
                             <div class="period-card-icon"><i class="fas fa-calendar-check"></i></div>
                             <div class="period-card-info">
                                 <span class="period-title">Período de Causación</span>

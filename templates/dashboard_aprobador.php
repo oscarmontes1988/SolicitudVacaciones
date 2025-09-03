@@ -61,13 +61,13 @@
     <div class="modal-content">
         <span class="close-modal">&times;</span>
         <h3 id="modal-title" class="modal-title"></h3>
-        <p class="modal-subtitle">Proporciona un motivo para esta decisión.</p>
+        <p class="modal-subtitle">Proporciona las observaciones necesarias para esta decisión.</p>
         <form id="form-decision" class="modal-form">
             <input type="hidden" id="modal_solicitud_id" name="solicitud_id">
             <input type="hidden" id="modal_decision" name="decision">
             <div class="form-group">
-                <label for="justificacion" class="form-label">Justificación:</label>
-                <textarea id="justificacion" name="justificacion" rows="4" class="form-textarea" placeholder="Escribe aquí tu justificación..."></textarea>
+                <label for="comentarios" class="form-label">Comentarios:</label>
+                <textarea id="comentarios" name="comentarios" rows="4" class="form-textarea" placeholder="Escriba aquí sus comentarios u observaciones..."></textarea>
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary btn-confirm">Confirmar</button>
@@ -76,4 +76,3 @@
         </form>
     </div>
 </div>
-

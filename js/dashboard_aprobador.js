@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalDecision = document.getElementById('modal_decision');
     const formDecision = document.getElementById('form-decision');
     const btnCancelModal = decisionModal.querySelector('.btn-cancel-modal');
-    const justificacionTextarea = document.getElementById('justificacion');
+    const justificacionTextarea = document.getElementById('comentarios');
 
     // Abre el modal al hacer clic en los botones Aprobar/Rechazar
     document.querySelectorAll('.btn-decision').forEach(button => {

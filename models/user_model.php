@@ -52,7 +52,7 @@ function getUserByUsername($conn, $username)
  */
 function getPeriodosCausacion($conn, $userId)
 {
-    $sql = "SELECT id, fecha_inicio, fecha_fin FROM periodos_causacion WHERE user_id = ? AND disponible = 1 ORDER BY fecha_inicio ASC";
+    $sql = "SELECT id, fecha_inicio, fecha_fin, disponible FROM periodos_causacion WHERE user_id = ? ORDER BY fecha_inicio ASC";
     $stmt = $conn->prepare($sql);
     if ($stmt === false) {
         return array();
@@ -62,10 +62,11 @@ function getPeriodosCausacion($conn, $userId)
     $id = null;
     $fecha_inicio = null;
     $fecha_fin = null;
-    $stmt->bind_result($id, $fecha_inicio, $fecha_fin);
+    $disponible = null;
+    $stmt->bind_result($id, $fecha_inicio, $fecha_fin, $disponible);
     $periodos = array();
     while ($stmt->fetch()) {
-        $periodos[] = array('id' => $id, 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin);
+        $periodos[] = array('id' => $id, 'fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin, 'disponible' => $disponible);
     }
     $stmt->close();
     return $periodos;

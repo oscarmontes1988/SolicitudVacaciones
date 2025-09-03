@@ -18,6 +18,11 @@
  * con una ruta absoluta, por ejemplo: `require_once '/var/www/config/database.php';`.
  */
 
+// --- CONFIGURACIÓN DE ZONA HORARIA ---
+// Es crucial para asegurar que todas las fechas y horas manejadas por PHP
+// sean consistentes y correctas, independientemente de la configuración del servidor.
+date_default_timezone_set('America/Bogota');
+
 // --- SECCIÓN DE CONFIGURACIÓN DE CREDENCIALES ---
 
 // MEJORA DE SEGURIDAD: Cargar variables de entorno desde el archivo .env

@@ -52,7 +52,6 @@ function getFestivosLeyEmiliani($year)
         $year . '-05-01',
         $year . '-07-20',
         $year . '-08-07',
-        $year . '-12-08',
         $year . '-12-25',
     );
 
@@ -64,6 +63,7 @@ function getFestivosLeyEmiliani($year)
     $festivos[] = moverAlLunesSiguiente(new DateTime($year . '-10-12'));
     $festivos[] = moverAlLunesSiguiente(new DateTime($year . '-11-01'));
     $festivos[] = moverAlLunesSiguiente(new DateTime($year . '-11-11'));
+    $festivos[] = moverAlLunesSiguiente(new DateTime($year . '-12-08'));
 
     // Festivos móviles basados en Pascua
     $pascuaClon1 = clone $pascua;
@@ -82,6 +82,7 @@ function getFestivosLeyEmiliani($year)
 
 function calcularDiasHabiles($fechaInicio, $fechaFin)
 {
+    error_log("DEBUG: calcularDiasHabiles - Fecha Inicio: " . $fechaInicio . ", Fecha Fin: " . $fechaFin);
     $inicio = new DateTime($fechaInicio);
     $fin = new DateTime($fechaFin);
     $fin->modify('+1 day');
@@ -98,17 +99,21 @@ function calcularDiasHabiles($fechaInicio, $fechaFin)
             $diasHabiles++;
         }
     }
+    error_log("DEBUG: calcularDiasHabiles - Días Hábiles calculados: " . $diasHabiles);
     return $diasHabiles;
 }
 
 function getSaldoVacaciones($conn, $userId, $diasPorPeriodo = 15)
 {
+    error_log("DEBUG: getSaldoVacaciones - User ID: " . $userId);
     $periodos = getPeriodosCausacion($conn, $userId);
     $diasGanados = count($periodos) * $diasPorPeriodo;
+    error_log("DEBUG: getSaldoVacaciones - Días Ganados: " . $diasGanados);
     $sql = "SELECT fecha_inicio_disfrute, fecha_fin_disfrute FROM solicitudes_vacaciones 
             WHERE user_id = ? AND (estado = 'Vacaciones Autorizadas' OR estado LIKE 'Esperando%')";
     $stmt = $conn->prepare($sql);
     if ($stmt === false) {
+        error_log("DEBUG: getSaldoVacaciones - Error preparing SQL: " . $conn->error);
         return 0;
     }
     $stmt->bind_param("i", $userId);
@@ -121,6 +126,8 @@ function getSaldoVacaciones($conn, $userId, $diasPorPeriodo = 15)
         $diasUsados += calcularDiasHabiles($fecha_inicio_disfrute, $fecha_fin_disfrute);
     }
     $stmt->close();
+    error_log("DEBUG: getSaldoVacaciones - Días Usados (total): " . $diasUsados);
+    error_log("DEBUG: getSaldoVacaciones - Saldo Final: " . ($diasGanados - $diasUsados));
     return $diasGanados - $diasUsados;
 }
 
@@ -203,15 +210,20 @@ function getSiguienteAprobador($tipoFuncionario, $estadoActual = null)
     return null;
 }
 
-function registrarAccionEnHistorial($conn, $solicitudId, $usuarioAccionId, $accion, $estadoResultante, $justificacion = null)
+function registrarAccionEnHistorial($conn, $solicitudId, $usuarioAccionId, $accion, $estadoResultante, $justificacion = null, $fechaAccion = null)
 {
-    $sql = "INSERT INTO solicitudes_historial (solicitud_id, usuario_accion_id, accion, estado_resultante, justificacion, fecha_accion) VALUES (?, ?, ?, ?, ?, NOW())";
+    if ($fechaAccion === null) {
+        date_default_timezone_set('America/Bogota');
+        $fechaAccion = date('Y-m-d H:i:s');
+    }
+
+    $sql = "INSERT INTO solicitudes_historial (solicitud_id, usuario_accion_id, accion, estado_resultante, justificacion, fecha_accion) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     if ($stmt === false) {
         error_log("Error al preparar la consulta de historial: " . $conn->error);
         return false;
     }
-    $stmt->bind_param("iisss", $solicitudId, $usuarioAccionId, $accion, $estadoResultante, $justificacion);
+    $stmt->bind_param("iissss", $solicitudId, $usuarioAccionId, $accion, $estadoResultante, $justificacion, $fechaAccion);
     $exito = $stmt->execute();
     if ($exito === false) {
         error_log("Error al ejecutar la inserción en historial: " . $stmt->error);

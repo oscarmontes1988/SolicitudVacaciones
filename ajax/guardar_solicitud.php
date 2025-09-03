@@ -31,6 +31,19 @@ if (empty($periodoId) || empty($fechaInicio) || empty($fechaFin) || strtotime($f
     exit;
 }
 
+// NEW: Check for overlapping requests
+$sqlCheckOverlap = "SELECT COUNT(*) as count FROM solicitudes_vacaciones WHERE user_id = ? AND estado != 'Rechazada' AND fecha_inicio_disfrute <= ? AND fecha_fin_disfrute >= ?";
+$stmtCheckOverlap = $conn->prepare($sqlCheckOverlap);
+$stmtCheckOverlap->bind_param("iss", $userId, $fechaFin, $fechaInicio);
+$stmtCheckOverlap->execute();
+$result = $stmtCheckOverlap->get_result()->fetch_assoc();
+$stmtCheckOverlap->close();
+
+if ($result['count'] > 0) {
+    echo json_encode(['status' => 'error', 'message' => 'Ya existe una solicitud de vacaciones que se superpone con las fechas seleccionadas.']);
+    exit;
+}
+
 // 3. Lógica de Negocio (Workflow)
 $primerAprobador = getSiguienteAprobador($tipoFuncionario);
 if ($primerAprobador === null) {
@@ -45,10 +58,13 @@ $estadoInicial = "Esperando Aprobación " . $primerAprobador;
 $conn->begin_transaction();
 
 try {
+    date_default_timezone_set('America/Bogota');
+    $fechaSolicitud = date('Y-m-d H:i:s');
+
     // 4. Inserción en 'solicitudes_vacaciones'
-    $sqlSolicitud = "INSERT INTO solicitudes_vacaciones (user_id, periodo_causacion_id, fecha_inicio_disfrute, fecha_fin_disfrute, estado, aprobador_actual) VALUES (?, ?, ?, ?, ?, ?)";
+    $sqlSolicitud = "INSERT INTO solicitudes_vacaciones (user_id, periodo_causacion_id, fecha_inicio_disfrute, fecha_fin_disfrute, estado, aprobador_actual, fecha_solicitud) VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmtSolicitud = $conn->prepare($sqlSolicitud);
-    $stmtSolicitud->bind_param("iissss", $userId, $periodoId, $fechaInicio, $fechaFin, $estadoInicial, $primerAprobador);
+    $stmtSolicitud->bind_param("iisssss", $userId, $periodoId, $fechaInicio, $fechaFin, $estadoInicial, $primerAprobador, $fechaSolicitud);
 
     if (!$stmtSolicitud->execute()) {
         throw new Exception("Error al guardar la solicitud principal.");
@@ -58,8 +74,20 @@ try {
     $nuevaSolicitudId = $conn->insert_id;
     $stmtSolicitud->close();
 
+    // Marcar el período como no disponible para evitar que se use en otra solicitud
+    $sqlUpdatePeriodo = "UPDATE periodos_causacion SET disponible = 0 WHERE id = ?";
+    $stmtUpdatePeriodo = $conn->prepare($sqlUpdatePeriodo);
+    if (!$stmtUpdatePeriodo) {
+        throw new Exception("Error al preparar la actualización del período.");
+    }
+    $stmtUpdatePeriodo->bind_param("i", $periodoId);
+    if (!$stmtUpdatePeriodo->execute()) {
+        throw new Exception("Error al actualizar el estado del período de causación.");
+    }
+    $stmtUpdatePeriodo->close();
+
     // 5. Inserción en 'solicitudes_historial' usando la función del modelo
-    if (!registrarAccionEnHistorial($conn, $nuevaSolicitudId, $userId, 'Creada', $estadoInicial)) {
+    if (!registrarAccionEnHistorial($conn, $nuevaSolicitudId, $userId, 'Creada', $estadoInicial, null, $fechaSolicitud)) {
         throw new Exception("Error al registrar la acción en el historial.");
     }
 
@@ -68,6 +96,16 @@ try {
 
     // 6. Preparamos la respuesta exitosa para el frontend
     $saldoActualizado = getSaldoVacaciones($conn, $userId); // Recalculamos el saldo de días
+    $periodosActualizados = getPeriodosCausacion($conn, $userId);
+
+    // Encontrar el nuevo periodo más antiguo disponible
+    $nuevoPeriodoMasAntiguoId = null;
+    foreach ($periodosActualizados as $p) {
+        if ($p['disponible'] == 1) {
+            $nuevoPeriodoMasAntiguoId = $p['id'];
+            break;
+        }
+    }
 
     // Obtenemos los datos completos de la nueva solicitud para devolverlos al frontend
     $sqlNuevaFila = "SELECT s.*, p.fecha_inicio AS periodo_inicio, p.fecha_fin AS periodo_fin 
@@ -94,7 +132,9 @@ try {
         'status' => 'success',
         'message' => 'Solicitud enviada correctamente.',
         'newRequestData' => $datosFila,
-        'diasDisponibles' => $saldoActualizado
+        'diasDisponibles' => $saldoActualizado,
+        'periodos' => $periodosActualizados,
+        'nuevoPeriodoId' => $nuevoPeriodoMasAntiguoId
     ));
 } catch (Exception $e) {
     // Si algo falló en el 'try', revertimos todos los cambios para mantener la BD consistente

@@ -14,7 +14,7 @@ require_once '../models/user_model.php';
 // Entrada
 $solicitudId     = isset($_POST['solicitud_id']) ? intval($_POST['solicitud_id']) : 0;
 $decision        = isset($_POST['decision']) ? $_POST['decision'] : '';
-$justificacion   = isset($_POST['justificacion']) ? trim($_POST['justificacion']) : '';
+$comentarios   = isset($_POST['comentarios']) ? trim($_POST['comentarios']) : '';
 $usuarioAccionId = $_SESSION['user']['id'];
 
 if ($solicitudId <= 0 || ($decision !== 'Aprobada' && $decision !== 'Rechazada')) {
@@ -24,7 +24,7 @@ if ($solicitudId <= 0 || ($decision !== 'Aprobada' && $decision !== 'Rechazada')
 
 // Consultar estado actual
 $sqlGet = "
-    SELECT s.user_id, s.estado, u.tipo_funcionario
+    SELECT s.user_id, s.estado, u.tipo_funcionario, s.periodo_causacion_id
     FROM solicitudes_vacaciones s
     JOIN users u ON s.user_id = u.id
     WHERE s.id = ?
@@ -37,7 +37,7 @@ if (!$stmtGet) {
 }
 $stmtGet->bind_param("i", $solicitudId);
 $stmtGet->execute();
-$stmtGet->bind_result($solicitud_user_id, $estadoActual, $tipoFuncionario);
+$stmtGet->bind_result($solicitud_user_id, $estadoActual, $tipoFuncionario, $periodoId);
 $solicitud_encontrada = $stmtGet->fetch();
 $stmtGet->close();
 
@@ -61,39 +61,53 @@ if ($decision === 'Rechazada') {
 
 // ✅ TRANSACCIÓN CON CONFIRMACIÓN REAL
 $conn->begin_transaction();
-$todoCorrecto = true;
 
 try {
-    // Actualizar solicitud
-    $sqlUpdate = "
-        UPDATE solicitudes_vacaciones
-        SET estado = ?, justificacion_aprobador = ?, aprobador_actual = ?
-        WHERE id = ?
-    ";
+    // 1. Actualizar la solicitud principal
+    $sqlUpdate = "UPDATE solicitudes_vacaciones SET estado = ?, comentarios_aprobador = ?, aprobador_actual = ? WHERE id = ?";
     $stmtUpdate = $conn->prepare($sqlUpdate);
     if (!$stmtUpdate) {
         throw new Exception("Error en prepare de actualización: " . $conn->error);
     }
-
-    $stmtUpdate->bind_param("sssi", $estadoFinal, $justificacion, $siguienteAprobador, $solicitudId);
+    $stmtUpdate->bind_param("sssi", $estadoFinal, $comentarios, $siguienteAprobador, $solicitudId);
     if (!$stmtUpdate->execute()) {
         throw new Exception("Error al ejecutar update: " . $stmtUpdate->error);
     }
     $stmtUpdate->close();
 
-    // Registrar historial (NO ABORTA si falla)
-    $registrado = registrarAccionEnHistorial($conn, $solicitudId, $usuarioAccionId, $accion, $estadoFinal, $justificacion);
-    if (!$registrado) {
-        error_log("Falló registrarAccionEnHistorial para solicitud $solicitudId");
+    // 2. Registrar la acción en el historial
+    if (!registrarAccionEnHistorial($conn, $solicitudId, $usuarioAccionId, $accion, $estadoFinal, $comentarios)) {
+        // No abortamos la transacción por esto, pero lo registramos
+        error_log("ADVERTENCIA: Falló registrarAccionEnHistorial para solicitud $solicitudId");
     }
 
-    // Si todo lo crítico funcionó, confirmamos
+    // 3. Si la solicitud es Rechazada, liberar el período de causación
+    if ($decision === 'Rechazada') {
+        if (!empty($periodoId)) {
+            $sqlUpdatePeriodo = "UPDATE periodos_causacion SET disponible = 1 WHERE id = ?";
+            $stmtUpdatePeriodo = $conn->prepare($sqlUpdatePeriodo);
+            if (!$stmtUpdatePeriodo) {
+                throw new Exception("Error al preparar la liberación del período.");
+            }
+            $stmtUpdatePeriodo->bind_param("i", $periodoId);
+            if (!$stmtUpdatePeriodo->execute()) {
+                throw new Exception("Error al liberar el período de causación por rechazo.");
+            }
+            $stmtUpdatePeriodo->close();
+        }
+    }
+    // Nota: Si es aprobada, el período permanece no disponible (disponible=0), que es el estado que se 
+    // le asignó al momento de crear la solicitud. No se necesita ninguna acción aquí para la aprobación.
+
+    // 4. Si todo fue bien, confirmar la transacción
     $conn->commit();
+
     echo json_encode(array('status' => 'success', 'message' => 'Decisión procesada correctamente.'));
+
 } catch (Exception $e) {
     $conn->rollback();
-    error_log("ERROR en transacción solicitud $solicitudId: " . $e->getMessage());
-    echo json_encode(array('status' => 'error', 'message' => 'No se pudo procesar la solicitud.'));
+    error_log("ERROR en transacción de aprobación para solicitud $solicitudId: " . $e->getMessage());
+    echo json_encode(array('status' => 'error', 'message' => 'No se pudo procesar la solicitud: ' . $e->getMessage()));
 }
 
 $conn->close();
